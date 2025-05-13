@@ -1,4 +1,4 @@
-![Logo](assets/logo.jpg)
+![Logo](assets/logo-repo.jpg)
 
 ![Intro Movie](assets/intro_movie.gif)
 
