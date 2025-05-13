@@ -115,7 +115,7 @@ You can install and run this project using one of the following environments:
 
 3. **Clone the project repository**
     ```bash
-      git clone https://github.com/TrafficSimBenchmark/bo-urbanmobility-test.git
+      git clone https://github.com/UMN-Choi-Lab/BO4Mob.git
       cd bo-urbanmobility-test
     ```
 
@@ -186,7 +186,7 @@ You can install and run this project using one of the following environments:
 
 3. **Clone the repository**
     ```bash
-    git clone https://github.com/TrafficSimBenchmark/bo-urbanmobility-test.git
+    git clone https://github.com/UMN-Choi-Lab/BO4Mob.git
     ```
 
 4. **Install Python dependencies**
@@ -198,55 +198,6 @@ You can install and run this project using one of the following environments:
 
 5. **Run a code**
   - You're now ready to run the code within the cloned repository.
-
-</details>
-
-<!-- 
-**1. Build docker file**
-  
-  - Pull docker from docker hub
-    ```bash
-    docker pull choisumn/botrafficsim
-    ```
-  docker pull choisumn/botrafficsim
-
-  - Run docker container
-    ```bash
-    docker run -it --name container_name choisumn/botrafficsim
-    ```
-  
-**2. Check SUMO installation**
-
-  - When you run the docker container, SUMO is automatically installed.
-    If the submodule does not work, run the following code:
-
-    ```bash
-    git submodule init
-    git submodule update  
-    ```
-
-  - Ensure that the `SUMO_HOME` variable is  `/opt/sumo-1.12/share/sumo`
-
-
-### Windows
-**1. Clone this repository.**
-  ```bash
-  git clone https://github.com/TrafficSimBenchmark/bo-urbanmobility-test.git
-  ```
-
-
-**2. Install dependencies.**
-
-  ```bash
-  pip install -r requirements.txt
-  ```
-
-**3. Set environment variable for SUMO.**
-
-- Export SUMO_HOME=/path/to/your/sumo/installation (e.g., C:/Program Files (x86)/Eclipse/Sumo)
-
-- If you needed, edit your environment variables for your account -->
-
 
 ---
 
