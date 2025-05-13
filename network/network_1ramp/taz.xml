@@ -1,0 +1,13 @@
+<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
+    
+    <taz id="taz_0" shape="94194.87,31449.07 94523.39,30919.42 94724.53,31073.62 94355.78,31603.28 94194.87,31449.07" color="blue">
+        <tazSource id="848489712" weight="1.00" />
+        </taz>
+    <taz id="taz_1" shape="99042.23,27888.98 98841.10,27540.34 99518.25,27272.16 99705.98,27567.16 99042.23,27888.98" color="blue">
+        <tazSink id="95265004" weight="1.00" />
+    </taz>
+    <taz id="taz_49" shape="96086.40,29499.82 95898.39,29360.92 96388.06,28968.06 96560.64,29118.18 96086.40,29499.82" color="blue">
+        <tazSource id="394170392" weight="1.00" />
+        <tazSink id="394170394" weight="1.00" />
+    </taz>
+</additional>

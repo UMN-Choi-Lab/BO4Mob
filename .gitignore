@@ -1,0 +1,20 @@
+ # Python compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Output results
+# output/
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Wandb artifacts
+wandb/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+

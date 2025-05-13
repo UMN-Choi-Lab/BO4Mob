@@ -1,0 +1,19 @@
+{
+    "objective": "counts",
+    "network_name": "network_2corridor",
+    "sim_start_time": 0,
+    "sim_end_time": 3900,
+    "sim_stat_freq_sec": 300,
+    "sensor_start_time": 300,
+    "sensor_end_time": 3900,
+    "od_end_time": 3600,
+    "od_bound_start": 1,
+    "od_bound_end": 2000,
+    "n_init_search": 20,
+    "n_epoch": 100,
+    "bo_batch_size": 3,
+    "bo_num_restarts": 16,
+    "bo_raw_samples": 256,
+    "bo_sample_shape": 64,
+    "eliminate_sumo_run_files": "True"
+}

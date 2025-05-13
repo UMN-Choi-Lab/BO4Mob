@@ -1,0 +1,5 @@
+<data><interval id="DEFAULT_VEHTYPE" begin="0" end="3600">
+<tazRelation from="taz_0" to="taz_1" count="0" />
+<tazRelation from="taz_0" to="taz_49" count="0" />
+<tazRelation from="taz_49" to="taz_1" count="0" />
+</interval></data>

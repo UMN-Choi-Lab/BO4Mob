@@ -1,0 +1,23 @@
+# Copy of basic
+basic
+
+# Copy of basic
+custom_detector
+
+# test param fixForceOff for different demand levels
+fixForceOff
+
+# inputs that should be reported as problematic
+errors
+
+# fully actuated mode tests
+fully_actuated
+
+# test green rest
+green_rest
+
+# test green transfer
+green_transfer
+
+# cross phase switching
+cross_phase_switching

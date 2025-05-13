@@ -1,0 +1,4 @@
+<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
+    <vType id="DEFAULT_VEHTYPE" minGap="1.5" length="5" speedDev="0.0" carFollowModel="IDM" />
+    <edgeData id="edge_data_300sec_freq" freq="300" file="../../edge_data.xml" excludeEmpty="true" />
+</additional>

@@ -1,0 +1,37 @@
+<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">
+    
+    <taz id="taz_0" shape="93818.52,42851.44 93855.24,42988.13 93559.43,43065.65 93504.34,42928.96 93818.52,42851.44" color="blue">
+        <tazSource id="509747331" weight="1.00" />
+        </taz>
+    <taz id="taz_1" shape="101147.89,40728.01 101076.21,40477.11 101652.68,40342.70 101706.45,40563.73 101147.89,40728.01" color="blue">
+        <tazSink id="509747233" weight="1.00" />
+    </taz>
+    <taz id="taz_60" shape="94167.24,42980.12 94449.13,42912.52 94301.17,42350.01 93991.22,42432.92 94128.98,42949.51 94167.24,42980.12" color="blue">
+        <tazSource id="517256137" weight="1.00" />
+        <tazSink id="8923686" weight="1.00" />
+        <tazSource id="9547901" weight="1.00" />
+        </taz>
+    <taz id="taz_61" shape="95547.59,42790.41 95772.08,42737.09 95620.55,42142.19 95363.78,42201.11 95484.45,42702.01 95547.59,42790.41" color="blue">
+        <tazSource id="517294012" weight="1.00" />
+        <tazSource id="8924896" weight="1.00" />
+        <tazSink id="8927783" weight="1.00" />
+        <tazSink id="9331721" weight="1.00" />
+    </taz>
+    <taz id="taz_62" shape="97012.51,42249.71 97332.67,42137.46 97131.14,41603.01 96747.20,41757.35 96966.59,42270.11 97012.51,42249.71" color="blue">
+        <tazSink id="416220210#0" weight="1.00" />
+        <tazSource id="417523573" weight="1.00" />
+        <tazSource id="8925900#0" weight="1.00" />
+        </taz>
+    <taz id="taz_63" shape="98739.47,41758.55 98431.33,41093.72 98795.49,40951.79 99090.56,41646.50 98739.47,41758.55" color="blue">
+        <tazSink id="394170681#0" weight="1.00" />
+        <tazSink id="395307310#1" weight="1.00" />
+        <tazSource id="456097810#0" weight="1.00" />
+        <tazSource id="8925009" weight="1.00" />
+        </taz>
+    <taz id="taz_64" shape="99856.23,41340.23 99594.78,40729.56 99960.81,40567.09 100227.86,41220.71 99856.23,41340.23" color="blue">
+        <tazSource id="13143644#0" weight="1.00" />
+        <tazSink id="13143656#0" weight="1.00" />
+        <tazSource id="8927009#0" weight="1.00" />
+        <tazSink id="8927801#0" weight="1.00" />
+    </taz>
+</additional>

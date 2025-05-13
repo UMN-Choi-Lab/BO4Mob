@@ -1,0 +1,19 @@
+{
+    "objective": "counts",
+    "network_name": "network_1ramp",
+    "sim_start_time": 0,
+    "sim_end_time": 3600,
+    "sim_stat_freq_sec": 300,
+    "sensor_start_time": 0,
+    "sensor_end_time": 3600,
+    "od_end_time": 3300,
+    "od_bound_start": 1,
+    "od_bound_end": 2500,
+    "n_init_search": 10,
+    "n_epoch": 50,
+    "bo_batch_size": 2,
+    "bo_num_restarts": 8,
+    "bo_raw_samples": 128,
+    "bo_sample_shape": 64,
+    "eliminate_sumo_run_files": "True"
+}

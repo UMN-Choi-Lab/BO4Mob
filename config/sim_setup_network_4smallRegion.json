@@ -1,0 +1,19 @@
+{
+    "objective": "counts",
+    "network_name": "network_4smallRegion",
+    "sim_start_time": 0,
+    "sim_end_time": 4200,
+    "sim_stat_freq_sec": 300,
+    "sensor_start_time": 600,
+    "sensor_end_time": 4200,
+    "od_end_time": 3600,
+    "od_bound_start": 1,
+    "od_bound_end": 2000,
+    "n_init_search": 50,
+    "n_epoch": 600,
+    "bo_batch_size": 5,
+    "bo_num_restarts": 64,
+    "bo_raw_samples": 1024,
+    "bo_sample_shape": 128,
+    "eliminate_sumo_run_files": "True"
+}
