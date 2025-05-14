@@ -97,7 +97,7 @@ def main():
         "--hour",
         type=str,
         default="08-09",
-        choices=["05-06", "08-09", "12-13", "17-18"],
+        choices=["06-07", "08-09", "17-18"],
         help="Time for simulation",
     )
     parser.add_argument(
