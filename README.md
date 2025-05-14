@@ -237,8 +237,8 @@ This mode runs a simulation using a manually defined OD vector (`x`) and compare
 #### 🔧 Argument Details
 
 - `--network_name`: One of `["1ramp", "2corridor", "3junction", "4smallRegion", "5fullRegion"]`
-- `--date`: Integer representing the simulation date in `yymmdd` format (e.g., `221014` for October 14, 2022)
-- `--hour`: Time window for simulation in `HH-HH` format, where the first value is the start hour and the second is the end hour (e.g., `08-09` means from 08:00 to 09:00)
+- `--date`: Integer representing the simulation date in `yymmdd` format (e.g., `221014` for October 14, 2022); one of `221008`-`221021`
+- `--hour`: Time window for simulation in `HH-HH` format, where the first value is the start hour and the second is the end hour (e.g., `08-09` means from 08:00 to 09:00); one of `["06-07", "08-09", "17-18"]`
 - `--routes_per_od`: *(optional)* Type of routes to use for the simulation; choose between `single` (default) for one representative route per OD pair, or `multiple` for multiple precomputed routes per OD pair
 - `--od_values`: (Only for `1ramp`) Three integer OD values as direct input, e.g., `--od_values 2092 609 386`
   - The appropriate range for each OD value depends on spatiotemporal characteristics. For weekday morning peak hours, values up to 2500 per OD are recommended for the 1ramp network, and up to 2000 per OD for all other networks.
@@ -315,8 +315,8 @@ This mode runs an initial search followed by model-based optimization (if specif
 
 - `--network_name`: One of `["1ramp", "2corridor", "3junction", "4smallRegion", "5fullRegion"]`
 - `--model_name`: Optimization model to run, one of `["initSearch", "spsa", "vanillabo", "saasbo", "turbo"]`
-- `--date`: Integer representing the simulation date in `yymmdd` format (e.g., `221014` for October 14, 2022)
-- `--hour`: Time window for simulation in `HH-HH` format, where the first value is the start hour and the second is the end hour (e.g., `08-09` means from 08:00 to 09:00)
+- `--date`: Integer representing the simulation date in `yymmdd` format (e.g., `221014` for October 14, 2022); one of `221008`-`221021`
+- `--hour`: Time window for simulation in `HH-HH` format, where the first value is the start hour and the second is the end hour (e.g., `08-09` means from 08:00 to 09:00); one of `["06-07", "08-09", "17-18"]`
 - `--routes_per_od`: *(optional)* Type of routes to use for the simulation; choose between `single` (default) for one representative route per OD pair, or `multiple` for multiple precomputed routes per OD pair
 - `--seed`: Random seed for reproducibility (must be 1- or 2-digit integer)
 - `--cpu_max`: Number of CPU cores to use for parallel simulation
