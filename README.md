@@ -38,8 +38,7 @@ This benchmark supports the following OD estimation strategies:
 
 **Data repository**
 
-The data is also in this repository.
-- [https://github.com/UMN-Choi-Lab/BO4Mob_dataset](https://github.com/UMN-Choi-Lab/BO4Mob_dataset)
+The dataset is also included in this repository: [https://github.com/UMN-Choi-Lab/BO4Mob_dataset](https://github.com/UMN-Choi-Lab/BO4Mob_dataset)
 
 ---
 
@@ -168,8 +167,8 @@ You can install and run this project using one of the following environments:
 
 
 <details>
-<summary><strong>🔲 Windows (Manual setup)</strong></summary>
-🪟 Follow these steps to set up and run the benchmark on Windows without using Docker.
+<summary><strong>🪟 Windows (Manual setup)</strong></summary>
+Follow these steps to set up and run the benchmark on Windows without using Docker.
 
 ### 🛠️ Step-by-Step
 
