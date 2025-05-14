@@ -198,6 +198,7 @@ You can install and run this project using one of the following environments:
 
 5. **Run a code**
   - You're now ready to run the code within the cloned repository.
+</details>
 
 ---
 
