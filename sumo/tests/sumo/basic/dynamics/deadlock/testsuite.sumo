@@ -1,9 +1,0 @@
-# test option time to teleport
-time-to-teleport
-time-to-teleport.highways
-
-# teleporting over multiple edges
-teleport_multihop
-
-# test option time-to-teleport.remove
-time-to-teleport.remove

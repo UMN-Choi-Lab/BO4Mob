@@ -1,5 +1,0 @@
-<configuration>
-    <input>
-        <net-file value="ne%.net.xml"/>
-    </input>
-</configuration>

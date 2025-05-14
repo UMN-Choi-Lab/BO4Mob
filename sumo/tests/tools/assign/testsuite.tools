@@ -1,9 +1,0 @@
-# DUA iteration tests
-dua-iterate
-duaIterate_analysis
-
-# DUA cost function tests
-costFunctionChecker
-
-# in simulation rerouting tests
-one-shot

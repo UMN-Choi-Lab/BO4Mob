@@ -1,3 +1,0 @@
-Could not connect in 61 tries
-Error: tcpip::Socket::accept() Unable to create listening socket: Die Adresse wird bereits verwendet
-Quitting (on error).

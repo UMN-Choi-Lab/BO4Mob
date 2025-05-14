@@ -1,5 +1,0 @@
-# recompute busStop lane after adding sidewalks
-repair_busStop_lane
-
-# recompute busStop lane after adding sidewalks (dynamically)
-repair_busStop_lane_guessSidewalks
