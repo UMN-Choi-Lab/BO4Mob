@@ -36,6 +36,11 @@ This benchmark supports the following OD estimation strategies:
 - **SAASBO**: Sparse Axis-Aligned Subspace Bayesian Optimization
 - **TuRBO**: Trust Region Bayesian Optimization
 
+**Data repository**
+
+The data is also in this repository.
+- [https://github.com/UMN-Choi-Lab/BO4Mob_dataset](https://github.com/UMN-Choi-Lab/BO4Mob_dataset)
+
 ---
 
 ## ⚙️ Installation
