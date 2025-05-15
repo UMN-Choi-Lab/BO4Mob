@@ -175,6 +175,8 @@ def update_trip_routes(
     # Ensure route DataFrame uses string type
     routes_df["fromTaz"] = routes_df["fromTaz"].astype(str)
     routes_df["toTaz"] = routes_df["toTaz"].astype(str)
+    routes_df["start_edge"] = routes_df["start_edge"].astype(str)
+    routes_df["last_edge"] = routes_df["last_edge"].astype(str)
 
     # Remove original 'from' and 'to' edges
     trips_df = trips_df.drop(columns=["from", "to"])

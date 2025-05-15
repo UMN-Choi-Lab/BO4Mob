@@ -241,10 +241,7 @@ This mode runs a simulation using a manually defined OD vector (`x`) and compare
 - `--hour`: Time window for simulation in `HH-HH` format, where the first value is the start hour and the second is the end hour (e.g., `08-09` means from 08:00 to 09:00); one of `["06-07", "08-09", "17-18"]`
 - `--routes_per_od`: *(optional)* Type of routes to use for the simulation; choose between `single` (default) for one representative route per OD pair, or `multiple` for multiple precomputed routes per OD pair
 - `--od_values`: (Only for `1ramp`) Three integer OD values as direct input, e.g., `--od_values 2092 609 386`
-  - The OD values must be given in the following order:
-    1. taz_0 -> taz_1
-    2. taz_0 -> taz_49
-    3. taz_49 -> taz_1
+  - The OD values must be given in the following order: (1) taz_0 → taz_1, (2) taz_0 → taz_49, (3) taz_49 -> taz_1
     <details>
     <summary>Map of 1ramp</summary>
     
