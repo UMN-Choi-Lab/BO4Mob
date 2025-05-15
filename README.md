@@ -241,6 +241,17 @@ This mode runs a simulation using a manually defined OD vector (`x`) and compare
 - `--hour`: Time window for simulation in `HH-HH` format, where the first value is the start hour and the second is the end hour (e.g., `08-09` means from 08:00 to 09:00); one of `["06-07", "08-09", "17-18"]`
 - `--routes_per_od`: *(optional)* Type of routes to use for the simulation; choose between `single` (default) for one representative route per OD pair, or `multiple` for multiple precomputed routes per OD pair
 - `--od_values`: (Only for `1ramp`) Three integer OD values as direct input, e.g., `--od_values 2092 609 386`
+  - The OD values must be given in the following order:
+    1. taz_0 -> taz_1
+    2. taz_0 -> taz_49
+    3. taz_49 -> taz_1
+    <details>
+    <summary>Map of 1ramp</summary>
+    
+    ![1ramp Map](./assets/1ramp-map.png)
+
+    Use it as a reference when assigning OD values.
+    </details>
   - The appropriate range for each OD value depends on spatiotemporal characteristics. For weekday morning peak hours, values up to 2500 per OD are recommended for the 1ramp network, and up to 2000 per OD for all other networks.
 - `--od_csv`: CSV file with a `flow` column containing OD values (e.g., `od_1ramp.csv` in `od_for_single_run/`)
 - `--launch_gui`: *(optional)* If provided, launches SUMO GUI after the simulation is completed
@@ -421,7 +432,7 @@ Use this script to visually inspect the simulation results using the SUMO GUI. I
 
    Use the following command structure:
 
-   ```bash
+   ```
    python visualization/sumo_gui_runner.py \
      --mode ${MODE} \
      --network_name ${NETWORK_NAME} \
@@ -483,12 +494,11 @@ This script allows you to generate **convergence plots** and visualize **the fit
      --max_epoch ${MAX_EPOCH}
    ```
    
-   Example
-    - A specified network:
+   Example:
     
-      ```bash
-      python visualization/results_visualization.py --network_name 2corridor --routes_per_od single --hour 08-09 --date 221014 --max_epoch 3
-      ```
+   ```bash
+   python visualization/results_visualization.py --network_name 2corridor --routes_per_od single --hour 08-09 --date 221014 --max_epoch 3
+   ```
 
 #### 📌 Notes
 * The generated plots are in the `visualization/figures` directory.
