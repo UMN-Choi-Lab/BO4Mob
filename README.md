@@ -460,5 +460,38 @@ Use this script to visually inspect the simulation results using the SUMO GUI. I
 <details>
 <summary><strong>Visualize Aggregated Results</strong> — Analyze and compare multiple optimization runs</summary>
 
+This script allows you to generate **convergence plots** and visualize **the fit to ground truth** for multiple optimization results.
+
+#### 🔧 Argument Details
+- `--network_name`: Name of the network scenario (e.g., `1ramp`)
+- `--routes_per_od`: Type of routes to use for the simulation; choose between `single` or `multiple`. 
+- `--hour`: Time window of the experiment (e.g., `08-09`)
+- `--date`: Simulation date in `yymmdd` format (e.g., `221014`)
+- `--max_epoch`: Maximum epoch number to visualize. Must be an integer. If any result folder does not contain data up to this epoch, an error will occur (e.g., 10, 100)
+
+
+#### Run the visualization script
+
+   Use the following command structure:
+
+   ```bash
+   python visualization/results_visualization.py \
+     --network_name ${NETWORK_NAME} \
+     --routes_per_od ${ROUTES_PER_OD} \
+     --hour ${HOUR} \
+     --date ${DATE} \
+     --max_epoch ${MAX_EPOCH}
+   ```
+   
+   Example
+
+      ```bash
+      python visualization/results_visualization.py --network_name 2corridor --routes_per_od single --hour '08-09' --date 221014 --max_epoch 3
+      ```
+
+#### 📌 Notes
+* ou can find the generated plots in the `visualization/figures` directory.
+
+
 
 </details>
