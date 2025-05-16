@@ -167,6 +167,7 @@ def main():
 
     # Extract the list of links where sensors are located
     link_selection = sensor_flow_gt["link_id"].tolist()
+    link_selection = list(map(str, link_selection))
     print(f"Number of sensors: {len(link_selection)}")
 
     # =====================
@@ -228,7 +229,6 @@ def main():
         # =====================
         # Visualize results
         # =====================
-
         save_fit_to_gt_plots_single_run(x, sensor_flow_gt, curr_link_stats, path_run_detail, network_name)
 
     # =====================

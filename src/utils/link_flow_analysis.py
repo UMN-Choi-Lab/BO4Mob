@@ -119,6 +119,9 @@ def compute_nrmse_counts_all_links(df_true: pd.DataFrame, df_simulated: pd.DataF
     float
         NRMSE value across all links.
     """
+    # Convert link_id columns to string
+    df_true["link_id"] = df_true["link_id"].astype(str)
+    df_simulated["link_id"] = df_simulated["link_id"].astype(str)
     df_merged = df_true.merge(df_simulated, on="link_id", suffixes=("_GT", "_sim"), how="left")
 
     # Fill missing simulated values with 0

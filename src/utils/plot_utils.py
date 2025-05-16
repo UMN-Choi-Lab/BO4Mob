@@ -92,29 +92,14 @@ def save_fit_to_gt_plots(data_set_total, sensor_flow_simul, sensor_flow_gt, path
             plt.savefig(path_figs / f"{curr_epoch}_fit_to_GT_link_flows.png")
             plt.close()
 
-            if network_name == "1ramp":
+            if network_name == "1ramp" and all(link_id in sensor_flow_gt["link_id"].values for link_id in ["848489711", "848489712", "95265016#1"]):
                 gt_od_vals = np.array(
                     [
-                        sensor_flow_gt.loc[
-                            sensor_flow_gt["link_id"] == "848489711",
-                            "interval_nVehContrib",
-                        ].values[0],
-                        sensor_flow_gt.loc[
-                            sensor_flow_gt["link_id"] == "848489711",
-                            "interval_nVehContrib",
-                        ].values[0]
-                        - sensor_flow_gt.loc[
-                            sensor_flow_gt["link_id"] == "848489712",
-                            "interval_nVehContrib",
-                        ].values[0],
-                        sensor_flow_gt.loc[
-                            sensor_flow_gt["link_id"] == "95265016#1",
-                            "interval_nVehContrib",
-                        ].values[0]
-                        - sensor_flow_gt.loc[
-                            sensor_flow_gt["link_id"] == "848489711",
-                            "interval_nVehContrib",
-                        ].values[0],
+                        sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],
+                        sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "848489712", "interval_nVehContrib"].values[0]
+                        - sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],
+                        sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "95265016#1", "interval_nVehContrib"].values[0]
+                        - sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],
                     ]
                 )
                 curr_od = (
@@ -137,8 +122,9 @@ def save_fit_to_gt_plots(data_set_total, sensor_flow_simul, sensor_flow_gt, path
     # Save the best result epoch and batch information to a text file
     best_epoch = int(opt_result_best.iloc[-1]["epoch"])
     best_batch = int(opt_result_best.iloc[-1]["batch"])
-    with open(path_opt_detail / f"Best result at epoch {best_epoch}, batch {best_batch}.txt", "w") as f:
-        f.write(f"Lowest NRMSE observed at epoch: {best_epoch}, batch: {best_batch}")
+    best_NRMSE = opt_result_best.iloc[-1]["loss"]
+    with open(path_opt_detail / f"Best result at epoch {best_epoch}, batch {best_batch}, NRMSE {best_NRMSE:.4f}.txt", "w") as f:
+        f.write(f"Lowest NRMSE observed at epoch: {best_epoch}, batch: {best_batch}, NRMSE: {best_NRMSE:.4f}")
 
 
 def save_fit_to_gt_plots_single_run(x, sensor_flow_gt, curr_link_stats, path_run_detail, network_name):
@@ -192,7 +178,7 @@ def save_fit_to_gt_plots_single_run(x, sensor_flow_gt, curr_link_stats, path_run
     plt.savefig(path_figs / "fit_to_GT_link_flows.png")
     plt.close()
 
-    if network_name == "1ramp":
+    if network_name == "1ramp" and all(link_id in sensor_flow_gt["link_id"].values for link_id in ["848489711", "848489712", "95265016#1"]):
         gt_od_vals = np.array(
             [
                 sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],

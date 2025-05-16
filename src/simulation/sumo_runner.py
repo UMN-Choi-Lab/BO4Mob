@@ -3,6 +3,7 @@ import subprocess
 import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from xml.dom import minidom
 
 # Third-party imports
 import numpy as np
@@ -131,6 +132,47 @@ def simulate_od(
         raise RuntimeError(f"Failed to run SUMO simulation: {e}")
 
 
+def write_trips_to_xml_pretty(trips_df: pd.DataFrame, output_file: Path, attr_cols: list[str]) -> None:
+    """
+    Write a SUMO-compatible trips XML file from a DataFrame with pretty formatting.
+
+    This function converts a DataFrame containing trip information into an XML file
+    that follows the SUMO <trip> format. The output is formatted with indentation 
+    and line breaks for improved readability.
+
+    Parameters
+    ----------
+    trips_df : pd.DataFrame
+        DataFrame containing trip data, where each row corresponds to a <trip> entry.
+    output_file : Path
+        Path to save the formatted trips XML file.
+    attr_cols : list of str
+        List of column names to include as attributes in each <trip> element.
+    """
+    def clean_val(x):
+        try:
+            return str(x)
+        except Exception:
+            return ""
+
+    # Root <routes> element
+    root = ET.Element("routes")
+
+    # Add each trip as a <trip> element
+    for _, row in trips_df.iterrows():
+        trip_attrs = {col: clean_val(row[col]) for col in attr_cols}
+        ET.SubElement(root, "trip", trip_attrs)
+
+    # Convert to string and pretty-print
+    rough_string = ET.tostring(root, encoding="utf-8")
+    reparsed = minidom.parseString(rough_string)
+    pretty_xml = reparsed.toprettyxml(indent="\t", encoding="utf-8")
+
+    # Write to file
+    with open(output_file, "wb") as f:
+        f.write(pretty_xml)
+
+
 def update_trip_routes(
     input_trip_file: Path, output_trip_file: Path, routes_df: pd.DataFrame, routes_per_od: str
 ) -> None:
@@ -192,11 +234,13 @@ def update_trip_routes(
         # For each unique fromTaz, toTaz pair in trips_df
         for (from_taz, to_taz), group in trips_df.groupby(['fromTaz', 'toTaz']):
             # Filter routes_df for the current fromTaz, toTaz pair
-            matching_routes = routes_df[(routes_df['fromTaz'] == from_taz) & (routes_df['toTaz'] == to_taz)]
+            matching_routes = routes_df[(routes_df['fromTaz'] == from_taz) & (routes_df['toTaz'] == to_taz)].copy()
 
             # If there are matching routes
             if not matching_routes.empty:
-
+                # Normalize the ratio to sum to 1
+                matching_routes['ratio'] = matching_routes['ratio'] / matching_routes['ratio'].sum()
+                
                 # Assign start_edge and last_edge to trips_df based on the ratio using random selection
                 probabilities = matching_routes['ratio'].values
                 selected_routes = np.random.choice(matching_routes.index, size=len(group), p=probabilities)
@@ -216,23 +260,19 @@ def update_trip_routes(
     trips_df["departLane"] = "best"
 
     # Save updated trips to XML
-    trips_df.to_xml(
-        output_trip_file,
-        attr_cols=[
-            "id",
-            "depart",
-            "from",
-            "to",
-            "type",
-            "fromTaz",
-            "toTaz",
-            "departLane",
-            "departSpeed",
-        ],
-        root_name="routes",
-        row_name="trip",
-        index=False,
-    )
+    attr_cols = [
+        "id",
+        "depart",
+        "from",
+        "to",
+        "type",
+        "fromTaz",
+        "toTaz",
+        "departLane",
+        "departSpeed",
+    ]
+
+    write_trips_to_xml_pretty(trips_df, output_trip_file, attr_cols)
 
 
 def create_od_tazrelation_xml(od_df: pd.DataFrame, output_file: Path, od_end_time_seconds: int) -> None:

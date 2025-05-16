@@ -202,7 +202,7 @@ def run_sample_evaluation(
         - curr_loss (float): NRMSE loss between simulated and ground-truth link flows.
         - curr_link_stats (pd.DataFrame): DataFrame with detailed simulation results for each link.
     """
-    print(f"\n##### BO Iteration {i} — Sample {j} #####")
+    print(f"\n##### Epoch {i} — Batch {j} #####")
 
     # Prepare file paths
     new_od_xml = f"{path_opt_simul}/opt_{i}_{j}_od.xml"

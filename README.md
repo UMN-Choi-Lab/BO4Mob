@@ -249,7 +249,7 @@ This mode runs a simulation using a manually defined OD vector (`x`) and compare
 
     Use it as a reference when assigning OD values.
     </details>
-  - The appropriate range for each OD value depends on spatiotemporal characteristics. For weekday morning peak hours, values up to 2500 per OD are recommended for the 1ramp network, and up to 2000 per OD for all other networks.
+  - The appropriate range for each OD value depends on spatiotemporal characteristics. For weekday morning peak hours, values up to 2500 per OD are recommended for the 1ramp network.
 - `--od_csv`: CSV file with a `flow` column containing OD values (e.g., `od_1ramp.csv` in `od_for_single_run/`)
 - `--launch_gui`: *(optional)* If provided, launches SUMO GUI after the simulation is completed
 
@@ -415,15 +415,9 @@ Use this script to visually inspect the simulation results using the SUMO GUI. I
    This script does not run simulations — it only visualizes existing ones.  
    Make sure your simulation output exists under `output/`.
 
-   - For `single_od_run`, the folder format is:
-     ```
-     output/single_od_run/{date}_{hour}_{routes_per_od}_{od_input}/
-     ```
+   - For `single_od_run`, the folder format is: `output/single_od_run/{date}_{hour}_{routes_per_od}_{od_input}/`
 
-   - For `full_optimization`, the folder format is:
-     ```
-     output/full_optimization/network_{network_name}_{model_name}_{date}_{hour}_{routes_per_od}_seed-{seed}/
-     ```
+   - For `full_optimization`, the folder format is: `output/full_optimization/network_{network_name}_{model_name}_{date}_{hour}_{routes_per_od}_seed-{seed}/`
 
 3. **Run the visualization script**
 
@@ -455,7 +449,7 @@ Use this script to visually inspect the simulation results using the SUMO GUI. I
     - Full Optimization:
 
       ```bash
-      python visualization/sumo_gui_runner.py --mode full_optimization --network_name 1ramp --model_name vanillabo --date 221014 --hour 08-09 --routes_per_od multiple --seed 1 --epoch 1 --batch 1
+      python visualization/sumo_gui_runner.py --mode full_optimization --network_name 1ramp --model_name vanillabo --date 221014 --hour 08-09 --routes_per_od multiple --seed 1 --epoch 26 --batch 2
       ```
 
 #### 📌 Notes
