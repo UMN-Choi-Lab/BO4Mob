@@ -54,11 +54,11 @@ You can install and run this project using one of the following environments:
 
 1. **Pull the Docker image from Docker Hub**  
     ```bash
-    docker pull choisumn/botrafficsim
+    docker pull choisumn/bo4mob
     ```
 2. **Run the Docker container**
    ```bash
-   docker run -it --name container_name choisumn/botrafficsim
+   docker run -it --name container_name choisumn/bo4mob
    ```
 3. **Initialize submodules (if needed)**
 
