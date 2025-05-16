@@ -493,6 +493,11 @@ This script allows you to generate **convergence plots** and visualize **the fit
 
 #### 📌 Notes
 * The generated plots are in the `visualization/figures` directory.
+* Executing this code will generate the following figure.
 
+<p align="center">
+  <img src="assets/example_convergence.png" alt="Convergence Plot" width="280"/>
+  <img src="assets/example_fit.png" alt="Fit to Ground Truth" width="280"/>
+</p>
 
 </details>
