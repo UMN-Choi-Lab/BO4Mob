@@ -60,6 +60,7 @@ You can install and run this project using one of the following environments:
    ```bash
    docker run -it --name container_name choisumn/bo4mob
    ```
+   Attach to the running container and go to the `/app` directory.
 3. **Initialize submodules (if needed)**
 
     When you run the docker container, SUMO is automatically installed. If the submodule does not work, run the following code:
@@ -488,7 +489,7 @@ This script allows you to generate **convergence plots** and visualize **the fit
    Example:
     
    ```bash
-   python visualization/results_visualization.py --network_name 2corridor --routes_per_od single --hour 08-09 --date 221014 --max_epoch 3
+   python visualization/results_visualization.py --network_name 1ramp --routes_per_od multiple --hour 08-09 --date 221014 --max_epoch 3
    ```
 
 #### 📌 Notes
