@@ -11,7 +11,7 @@ from optimizers.base_strategy import BaseStrategy
 from simulation.evaluation import run_sample_evaluation
 
 
-def spsa_update(f, d, a=0.2, c=0.1, A=10, alpha=0.602, gamma=0.101, k=0):
+def spsa_update(d, a=0.2, c=0.1, A=10, alpha=0.602, gamma=0.101, k=0):
     """
     Single SPSA update step (returns perturbed OD vectors and internal params).
 
@@ -69,6 +69,7 @@ class SPSAStrategy(BaseStrategy):
         path_opt_result,
         base_path,
         routes_df,
+        routes_per_od,
         sensor_flow_gt,
         link_selection,
     ):
@@ -91,6 +92,8 @@ class SPSAStrategy(BaseStrategy):
             Base experiment path.
         routes_df : pd.DataFrame
             Route data.
+        routes_per_od : str
+            Type of routes to use for the simulation (single or multiple).
         sensor_flow_gt : pd.DataFrame
             Ground truth traffic flow data.
         link_selection : list[str]
@@ -106,6 +109,7 @@ class SPSAStrategy(BaseStrategy):
         self.path_opt_result = path_opt_result
         self.base_path = base_path
         self.routes_df = routes_df
+        self.routes_per_od = routes_per_od
         self.sensor_flow_gt = sensor_flow_gt
         self.link_selection = link_selection
 
@@ -130,7 +134,7 @@ class SPSAStrategy(BaseStrategy):
             A single suggested candidate OD vector (unnormalized).
         """
         k = epoch - 1
-        d_plus, d_minus, ak, ck, delta = spsa_update(None, self.d_k, k=k, **self.params["spsa_params"])
+        d_plus, d_minus, ak, ck, delta = spsa_update(self.d_k, k=k, **self.params["spsa_params"])
 
         x_plus = unnormalize(torch.tensor(d_plus), self.bounds).numpy()
         x_minus = unnormalize(torch.tensor(d_minus), self.bounds).numpy()
@@ -149,6 +153,7 @@ class SPSAStrategy(BaseStrategy):
                         self.path_opt_simul,
                         self.base_path,
                         self.routes_df,
+                        self.routes_per_od,
                         self.sensor_flow_gt,
                         self.link_selection,
                         len(Y_all_real),
@@ -162,6 +167,7 @@ class SPSAStrategy(BaseStrategy):
                         self.path_opt_simul,
                         self.base_path,
                         self.routes_df,
+                        self.routes_per_od,
                         self.sensor_flow_gt,
                         self.link_selection,
                         len(Y_all_real),

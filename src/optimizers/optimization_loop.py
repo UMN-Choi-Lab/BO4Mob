@@ -120,6 +120,7 @@ def run_optimization_loop(
         path_opt_result=path_opt_result,
         base_path=base_path,
         routes_df=routes_df,
+        routes_per_od=routes_per_od,
         sensor_flow_gt=sensor_flow_gt,
         link_selection=link_selection,
     )
