@@ -31,7 +31,8 @@ def run_optimization_loop(
     base_path,
     routes_df,
     routes_per_od,
-    sensor_flow_gt,
+    eval_measure,
+    sensor_measure_gt,
     link_selection,
     path_opt_simul,
     path_opt_result,
@@ -70,8 +71,10 @@ def run_optimization_loop(
         Route definitions used in the simulation.
     routes_per_od : str
         Type of routes to use for the simulation (single or multiple).
-    sensor_flow_gt : pd.DataFrame
-        Ground truth sensor flow data.
+    eval_measure : str
+        Evaluation measure used for optimization (e.g., 'sensor', 'link').
+    sensor_measure_gt : pd.DataFrame
+        Ground truth sensor measurement data.
     link_selection : list[str]
         List of links used for evaluation.
     path_opt_simul : Path
@@ -98,7 +101,7 @@ def run_optimization_loop(
     run_simul_info_total = data_set_init_search[
         ["init_search", "epoch", "batch", "run_time", "num_train_data"]
     ].to_numpy()
-    sensor_flow_simul = pd.DataFrame(
+    sensor_measure_simul = pd.DataFrame(
         columns=[
             "epoch",
             "batch",
@@ -121,7 +124,8 @@ def run_optimization_loop(
         base_path=base_path,
         routes_df=routes_df,
         routes_per_od=routes_per_od,
-        sensor_flow_gt=sensor_flow_gt,
+        eval_measure=eval_measure,
+        sensor_measure_gt=sensor_measure_gt,
         link_selection=link_selection,
     )
 
@@ -162,7 +166,8 @@ def run_optimization_loop(
                             base_path,
                             routes_df,
                             routes_per_od,
-                            sensor_flow_gt,
+                            eval_measure,
+                            sensor_measure_gt,
                             link_selection,
                             num_train_data,
                         )
@@ -191,7 +196,8 @@ def run_optimization_loop(
                             base_path,
                             routes_df,
                             routes_per_od,
-                            sensor_flow_gt,
+                            eval_measure,
+                            sensor_measure_gt,
                             link_selection,
                             num_train_data,
                         )
@@ -209,10 +215,10 @@ def run_optimization_loop(
         Y_all_real = torch.cat([Y_all_real, Y_new_real], dim=0)
 
         run_simul_info_total = np.vstack([run_simul_info_total, np.array(run_simul_info_batch)])
-        if sensor_flow_simul.empty:
-            sensor_flow_simul = curr_loop_stats_batch_df.copy()
+        if sensor_measure_simul.empty:
+            sensor_measure_simul = curr_loop_stats_batch_df.copy()
         else:
-            sensor_flow_simul = pd.concat([sensor_flow_simul, curr_loop_stats_batch_df], ignore_index=True)
+            sensor_measure_simul = pd.concat([sensor_measure_simul, curr_loop_stats_batch_df], ignore_index=True)
 
         if hasattr(strategy, "update"):
             strategy.update(Y_new_real)
@@ -231,7 +237,7 @@ def run_optimization_loop(
         data_set_total["loss"] = data_set_total["loss"] * (-1)
 
         data_set_total.to_csv(path_opt_result / "data_set.csv", index=False)
-        sensor_flow_simul.to_csv(path_opt_result / "sensor_flow_simul.csv", index=False)
+        sensor_measure_simul.to_csv(path_opt_result / "sensor_measure_simul.csv", index=False)
         model_run_time_df.to_csv(path_opt_result / "model_run_time.csv", index=False)
 
         print(f"[Saved] Epoch {i} results")
@@ -244,4 +250,4 @@ def run_optimization_loop(
     with open(run_time_file, "w") as f:
         f.write(f"Total code run time: {h}h {m}m {s}s")
 
-    return data_set_total, sensor_flow_simul
+    return data_set_total, sensor_measure_simul

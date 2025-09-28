@@ -1,4 +1,4 @@
-link_id,interval_nVehContrib,interval_avgSpeed
+link_id,interval_nVehContrib,interval_harmonicMeanSpeed
 157607510,2995.0,68.6
 157607513#1,3915.0,67.1917
 157607517,2482.0,65.9667

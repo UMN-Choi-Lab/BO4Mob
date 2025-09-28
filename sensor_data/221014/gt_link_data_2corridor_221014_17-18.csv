@@ -1,4 +1,4 @@
-link_id,interval_nVehContrib,interval_avgSpeed
+link_id,interval_nVehContrib,interval_harmonicMeanSpeed
 479773095,6037.0,41.3417
 509747288,5894.0,55.5167
 509747324-AddedOnRampEdge,5981.0,49.4167

@@ -70,7 +70,8 @@ class SPSAStrategy(BaseStrategy):
         base_path,
         routes_df,
         routes_per_od,
-        sensor_flow_gt,
+        eval_measure,
+        sensor_measure_gt,
         link_selection,
     ):
         """
@@ -94,8 +95,10 @@ class SPSAStrategy(BaseStrategy):
             Route data.
         routes_per_od : str
             Type of routes to use for the simulation (single or multiple).
-        sensor_flow_gt : pd.DataFrame
-            Ground truth traffic flow data.
+        eval_measure : str
+            Evaluation measure used for optimization (e.g., 'count', 'speed').
+        sensor_measure_gt : pd.DataFrame
+            Ground truth traffic measurement data.
         link_selection : list[str]
             List of link IDs used in evaluation.
         """
@@ -110,7 +113,8 @@ class SPSAStrategy(BaseStrategy):
         self.base_path = base_path
         self.routes_df = routes_df
         self.routes_per_od = routes_per_od
-        self.sensor_flow_gt = sensor_flow_gt
+        self.eval_measure = eval_measure
+        self.sensor_measure_gt = sensor_measure_gt
         self.link_selection = link_selection
 
     def suggest(self, X_all_fullD_norm, Y_all_real, epoch, seed):
@@ -154,7 +158,8 @@ class SPSAStrategy(BaseStrategy):
                         self.base_path,
                         self.routes_df,
                         self.routes_per_od,
-                        self.sensor_flow_gt,
+                        self.eval_measure,
+                        self.sensor_measure_gt,
                         self.link_selection,
                         len(Y_all_real),
                     ),
@@ -168,7 +173,8 @@ class SPSAStrategy(BaseStrategy):
                         self.base_path,
                         self.routes_df,
                         self.routes_per_od,
-                        self.sensor_flow_gt,
+                        self.eval_measure,
+                        self.sensor_measure_gt,
                         self.link_selection,
                         len(Y_all_real),
                     ),
