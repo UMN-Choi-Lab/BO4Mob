@@ -101,6 +101,13 @@ def main():
         help="Time for simulation",
     )
     parser.add_argument(
+        "--eval_measure",
+        type=str,
+        default="count",
+        choices=["count", "speed"],
+        help="Evaluation measurements"
+    )
+    parser.add_argument(
         "--routes_per_od",
         type=str,
         default='single',
@@ -134,6 +141,7 @@ def main():
     date = args.date
     hour = args.hour
     network_name = args.network_name
+    eval_measure = args.eval_measure
     routes_per_od = args.routes_per_od
 
     # =====================
@@ -163,10 +171,10 @@ def main():
 
     # Load ground-truth sensor flow data
     true_sensor_file_name = f"gt_link_data_{network_name}_{date}_{hour}.csv"
-    sensor_flow_gt = pd.read_csv(base_path + f"/sensor_data/{date}/" + true_sensor_file_name)
+    sensor_measure_gt = pd.read_csv(base_path + f"/sensor_data/{date}/" + true_sensor_file_name)
 
     # Extract the list of links where sensors are located
-    link_selection = sensor_flow_gt["link_id"].tolist()
+    link_selection = sensor_measure_gt["link_id"].tolist()
     link_selection = list(map(str, link_selection))
     print(f"Number of sensors: {len(link_selection)}")
 
@@ -183,7 +191,7 @@ def main():
         od_file = None
 
     path_run_detail, path_run_simul, path_run_result, path_existence = prepare_run_paths(
-        config["path_run"], date, hour, routes_per_od, seed=None, od_file=od_file
+        config["path_run"], date, hour, eval_measure, routes_per_od, seed=None, od_file=od_file
     )
 
     if path_existence:
@@ -223,13 +231,14 @@ def main():
             routes_df,
             routes_per_od,
             link_selection,
-            sensor_flow_gt,
+            eval_measure,
+            sensor_measure_gt,
         )
 
         # =====================
         # Visualize results
         # =====================
-        save_fit_to_gt_plots_single_run(x, sensor_flow_gt, curr_link_stats, path_run_detail, network_name)
+        save_fit_to_gt_plots_single_run(eval_measure, x, sensor_measure_gt, curr_link_stats, path_run_detail, network_name)
 
     # =====================
     # Optionally launch SUMO GUI

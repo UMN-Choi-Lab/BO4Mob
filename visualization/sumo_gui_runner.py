@@ -185,6 +185,13 @@ def main():
         help="Time for simulation",
     )
     parser.add_argument(
+        "--eval_measure",
+        type=str,
+        default="count",
+        choices=["count", "speed"],
+        help="Evaluation measurements"
+    )
+    parser.add_argument(
         "--routes_per_od",
         type=str,
         default='single',
@@ -214,6 +221,7 @@ def main():
                 f'network_{args.network_name}' in folder.name
                 and str(args.date) in folder.name
                 and args.hour in folder.name
+                and args.eval_measure in folder.name
                 and args.routes_per_od in folder.name
                 and args.od_input in folder.name
             )
@@ -227,6 +235,7 @@ def main():
                 and args.model_name in folder.name
                 and str(args.date) in folder.name
                 and args.hour in folder.name
+                and args.eval_measure in folder.name
                 and args.routes_per_od in folder.name
                 and f"seed-{args.seed:02d}" in folder.name
             )
@@ -237,7 +246,7 @@ def main():
             raise FileNotFoundError(
                 (
                     f"Expected exactly one folder containing '{args.network_name}', "
-                    f"'{args.date}', '{args.hour}', '{args.routes_per_od}', and '{args.od_input}', "
+                    f"'{args.date}', '{args.hour}', '{args.eval_measure}', '{args.routes_per_od}', and '{args.od_input}', "
                     f"but found {len(matching_folders)}."
                 )
             )
@@ -246,7 +255,7 @@ def main():
                 (
                     f"Expected exactly one folder containing '{args.network_name}', "
                     f"'{args.model_name}', '{args.date}', '{args.hour}', "
-                    f"'{args.routes_per_od}', and 'seed-{args.seed:02d}', "
+                    f"'{args.eval_measure}', '{args.routes_per_od}', and 'seed-{args.seed:02d}', "
                     f"but found {len(matching_folders)}."
                 )
             )

@@ -65,7 +65,7 @@ def parse_link_flow_xml_to_pandas(
                 "interval_end": interval_end,
                 "interval_id": interval_id,
                 "link_id": link_id,
-                "link_speed": float(speed_str) if speed_str is not None else 0.0,
+                "link_speed": float(speed_str)*2.23694 if speed_str is not None else 0.0,
                 "link_arrived": float(arrived_str) if arrived_str is not None else 0.0,
                 "link_left": float(left_str) if left_str is not None else 0.0,
             }

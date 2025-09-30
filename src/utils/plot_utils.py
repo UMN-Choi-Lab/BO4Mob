@@ -202,11 +202,11 @@ def save_fit_to_gt_plots_single_run(eval_measure, x, sensor_measure_gt, curr_lin
     if network_name == "1ramp" and all(link_id in sensor_measure_gt["link_id"].values for link_id in ["848489711", "848489712", "95265016#1"]):
         gt_od_vals = np.array(
             [
-                sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489711", col_name].values[0],
-                sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489712", col_name].values[0]
-                - sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489711", col_name].values[0],
-                sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "95265016#1", col_name].values[0]
-                - sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489711", col_name].values[0],
+                sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],
+                sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489712", "interval_nVehContrib"].values[0]
+                - sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],
+                sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "95265016#1", "interval_nVehContrib"].values[0]
+                - sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],
             ]
         )
 
