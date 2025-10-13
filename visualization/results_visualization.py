@@ -46,6 +46,13 @@ def main():
         choices=["1ramp", "2corridor", "3junction", "4smallRegion", "5fullRegion"],
     )
     parser.add_argument(
+        "--kernel",
+        type=str,
+        default="matern-2p5",
+        choices=["matern-1p5", "matern-2p5", "rbf"],
+        help="GP kernel type used in the BO model",
+    )
+    parser.add_argument(
         "--date",
         type=str,
         default="221014",
@@ -87,6 +94,7 @@ def main():
     # Set experiment settings
     # =====================
     network_name = args.network_name
+    kernel = args.kernel
     date = args.date
     hour = args.hour
     eval_measure = args.eval_measure
@@ -101,12 +109,14 @@ def main():
     list_folder_name = [
         folder for folder in folders
         if network_name in folder and
+        (kernel in folder or 'none' in folder) and
         date in folder and
         hour in folder and
         eval_measure in folder and
         routes_per_od in folder and
         'initSearch' not in folder
     ]
+    print("Selected folders:", list_folder_name)
     
     net_name = f'{network_name}_'
     model_list = [folder.split(net_name)[1].split('_')[0] for folder in list_folder_name if net_name in folder]

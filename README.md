@@ -326,6 +326,7 @@ This mode runs an initial search followed by model-based optimization (if specif
 
 - `--network_name`: One of `["1ramp", "2corridor", "3junction", "4smallRegion", "5fullRegion"]`
 - `--model_name`: Optimization model to run, one of `["initSearch", "spsa", "vanillabo", "saasbo", "turbo"]`
+- `--kernel`: GP kernel type used in the BO model, one of `["matern-1p5", "matern-2p5", "rbf", "none"]`
 - `--date`: Integer representing the simulation date in `yymmdd` format (e.g., `221014` for October 14, 2022); one of `221008`-`221021`
 - `--hour`: Time window for simulation in `HH-HH` format, where the first value is the start hour and the second is the end hour (e.g., `08-09` means from 08:00 to 09:00); one of `["06-07", "08-09", "17-18"]`
 - `--eval_measure`: *(optional)* Link-level measurement used to evaluate the simulation against ground-truth sensor data; choose between `count` (default) for vehicle counts, or `speed` for vehicle speeds (mph)
@@ -349,6 +350,7 @@ This mode runs an initial search followed by model-based optimization (if specif
     python src/full_optimization.py \
       --network_name ${NETWORK_NAME} \
       --model_name ${MODEL_NAME} \
+      --kernel ${MODEL_NAME} \
       --date ${DATE} \
       --hour ${HOUR} \
       [--eval_measure ${EVAL_MEASURE}] \
@@ -360,11 +362,11 @@ This mode runs an initial search followed by model-based optimization (if specif
    Example
    - **Run full optimization with BO**:
       ```
-      python src/full_optimization.py --network_name 1ramp --model_name vanillabo --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --seed 1
+      python src/full_optimization.py --network_name 1ramp --model_name vanillabo --kernel matern-2p5 --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --seed 1
       ```
    - **Run only initial search phase (no model optimization)**:
       ```
-      python src/full_optimization.py --network_name 1ramp --model_name initSearch --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --seed 1
+      python src/full_optimization.py --network_name 1ramp --model_name initSearch --kernel none --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --seed 1
       ```
 
    If `model_name` is set to a model (e.g., `vanillabo`), it will:
@@ -375,7 +377,7 @@ This mode runs an initial search followed by model-based optimization (if specif
 
 3. **Check the results**
 
-   Optimization results will be saved under: `output/full_optimization/network_{network_name}_{model_name}_{date}_{hour}_{eval_measure}_{routes_per_od}_seed-{seed}/`
+   Optimization results will be saved under: `output/full_optimization/network_{network_name}_{model_name}_{kernel}_{date}_{hour}_{eval_measure}_{routes_per_od}_seed-{seed}/`
 
    Inside you'll find:
    - `simulation/`: Route, OD, and link flow files across iterations
@@ -384,6 +386,10 @@ This mode runs an initial search followed by model-based optimization (if specif
 
 #### 📌 Notes
 
+- The available GP kernels depend on the optimization model:  
+  `vanillabo` and `turbo` support `"matern-1.5"`, `"matern-2.5"`, and `"rbf"`;  
+  `saasbo` supports only `"matern-2.5"`;  
+  `spsa` and `initSearch` use `"none"` (no GP kernel).
 - If the initial search has already been completed for the same seed/config, only the model optimization will run.
 - Some large networks (e.g., `4smallRegion`, `5fullRegion`) may require significant memory and CPU resources. Make sure your machine meets the requirements.
 - You can limit CPU usage using the `--cpu_max` argument to avoid system overload.
@@ -396,6 +402,131 @@ This mode runs an initial search followed by model-based optimization (if specif
 
 <details>
 <summary><strong>Visualize SUMO Simulation</strong> — Replay simulation results in SUMO GUI</summary>
+
+Use this script to visually inspect the simulation results using the SUMO GUI. It works for both full optimization and single OD run experiments.
+
+#### 🔧 Argument Details
+- `--mode`: One of `["single_od_run", "full_optimization"]`
+- `--network_name`: Name of the network scenario (e.g., `1ramp`)
+- `--date`: Simulation date in `yymmdd` format (e.g., `221014`)
+- `--hour`: Time window of the experiment (e.g., `08-09`)
+- `--eval_measure`: Link-level measurement used for evaluation; choose between `count` (default) for vehicle counts, or `speed` for vehicle speeds (mph)
+- `--routes_per_od`: Type of routes to use for the simulation; choose between `single` (default) for one representative route per OD pair, or `multiple` for multiple precomputed routes per OD pair
+- `--overwrite`: If set, overwrites the original route file after sorting by vehicle departure time
+- `--od_input`: *(required for single_od_run)* Folder identifier, e.g., `od_1ramp_csv` or `od_2092_609_386_values`
+
+  Only for `full_optimization` mode:
+  - `--model_name`: Optimization algorithm name (e.g., `spsa`, `vanillabo`)
+  - `--kernel`: GP kernel type used in the BO model (e.g., `matern-1p5`, `matern-2p5`, `rbf`)
+  - `--seed`: Integer seed used for the experiment (e.g., `1`)
+  - `--epoch`, `--batch`: Epoch and batch indices of the optimization iteration to visualize
+
+#### 📋 Step-by-Step Instructions
+
+1. **Ensure a simulation has already been run**
+
+   This script does not run simulations — it only visualizes existing ones.  
+   Make sure your simulation output exists under `output/`.
+
+   - For `single_od_run`, the folder format is: `output/single_od_run/{date}_{hour}_{eval_measure}_{routes_per_od}_{od_input}/`
+
+   - For `full_optimization`, the folder format is: `output/full_optimization/network_{network_name}_{model_name}_{kernel}_{date}_{hour}_{eval_measure}_{routes_per_od}_seed-{seed}/`
+
+3. **Run the visualization script**
+
+   Use the following command structure:
+
+   ```
+   python visualization/sumo_gui_runner.py \
+     --mode ${MODE} \
+     --network_name ${NETWORK_NAME} \
+     --date ${DATE} \
+     --hour ${HOUR} \
+     --od_input ${OD_INPUT} \
+     [--eval_measure ${EVAL_MEASURE}] \
+     [--routes_per_od ${ROUTES_PER_OD}] \
+     [--model_name ${MODEL_NAME}] \
+     [--kernel ${KERNEL}] \
+     [--seed ${SEED}] \
+     [--epoch ${EPOCH}] \
+     [--batch ${BATCH}] \
+     [--overwrite]
+   ```
+   
+   Example
+
+    - Single OD Run:
+
+      ```bash
+      python visualization/sumo_gui_runner.py --mode single_od_run --network_name 1ramp --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --od_input od_1ramp_csv
+      ```
+
+    - Full Optimization:
+
+      ```bash
+      python visualization/sumo_gui_runner.py --mode full_optimization --network_name 1ramp --model_name vanillabo --kernel matern-2p5 --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --seed 1 --epoch 26 --batch 2
+      ```
+
+#### 📌 Notes
+* The script expects only one matching folder for the given input arguments. If multiple or no matches are found, it will raise an error.
+* The simulation must have been run beforehand so that *_routes.vehroutes.xml exists
+
+</details>
+
+
+<details>
+<summary><strong>Visualize Aggregated Results</strong> — Analyze and compare multiple optimization runs</summary>
+
+This script allows you to generate **convergence plots** and visualize **the fit to ground truth** for multiple optimization results.
+
+#### 🔧 Argument Details
+- `--network_name`: Name of the network scenario (e.g., `1ramp`)
+- `--kernel`: GP kernel type used in the BO model (e.g., `matern-2p5`)
+- `--date`: Simulation date in `yymmdd` format (e.g., `221014`)
+- `--hour`: Time window of the experiment (e.g., `08-09`)
+- `--eval_measure`: Evaluation measurements; choose between `count` or `speed`.
+- `--routes_per_od`: Type of routes to use for the simulation; choose between `single` or `multiple`. 
+- `--max_epoch`: Maximum epoch number to visualize. Must be an integer. If any result folder does not contain data up to this epoch, an error will occur (e.g., 10, 100)
+
+
+#### Run the visualization script
+
+   Use the following command structure:
+
+   ```bash
+   python visualization/results_visualization.py \
+     --network_name ${NETWORK_NAME} \
+     --kernel ${KERNEL} \
+     --date ${DATE} \
+     --hour ${HOUR} \
+     --eval_measure ${EVAL_MEASURE} \
+     --routes_per_od ${ROUTES_PER_OD} \
+     --max_epoch ${MAX_EPOCH}
+   ```
+   
+   Example:
+    
+   ```bash
+   python visualization/results_visualization.py --network_name 1ramp --kernel matern-2p5 --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --max_epoch 50
+   ```
+
+#### 📌 Notes
+* The generated plots are in the `visualization/figures` directory.
+* Executing this code will generate the following figure.
+
+<p align="center">
+  <img src="assets/example_convergence.png" alt="Convergence Plot" width="280"/>
+  <img src="assets/example_fit.png" alt="Fit to Ground Truth" width="280"/>
+</p>
+
+</details>
+
+---
+
+## 🧱 How to Extend the Benchmark
+
+<details>
+<summary><strong>Add New Traffic Network</strong></summary>
 
 Use this script to visually inspect the simulation results using the SUMO GUI. It works for both full optimization and single OD run experiments.
 
@@ -465,48 +596,144 @@ Use this script to visually inspect the simulation results using the SUMO GUI. I
 
 </details>
 
-
 <details>
-<summary><strong>Visualize Aggregated Results</strong> — Analyze and compare multiple optimization runs</summary>
+<summary><strong>Add New BO Method</strong></summary>
 
-This script allows you to generate **convergence plots** and visualize **the fit to ground truth** for multiple optimization results.
+Use this script to visually inspect the simulation results using the SUMO GUI. It works for both full optimization and single OD run experiments.
 
 #### 🔧 Argument Details
+- `--mode`: One of `["single_od_run", "full_optimization"]`
 - `--network_name`: Name of the network scenario (e.g., `1ramp`)
 - `--date`: Simulation date in `yymmdd` format (e.g., `221014`)
 - `--hour`: Time window of the experiment (e.g., `08-09`)
-- `--eval_measure`: Evaluation measurements; choose between `count` or `speed`.
-- `--routes_per_od`: Type of routes to use for the simulation; choose between `single` or `multiple`. 
-- `--max_epoch`: Maximum epoch number to visualize. Must be an integer. If any result folder does not contain data up to this epoch, an error will occur (e.g., 10, 100)
+- `--eval_measure`: Link-level measurement used for evaluation; choose between `count` (default) for vehicle counts, or `speed` for vehicle speeds (mph)
+- `--routes_per_od`: Type of routes to use for the simulation; choose between `single` (default) for one representative route per OD pair, or `multiple` for multiple precomputed routes per OD pair
+- `--overwrite`: If set, overwrites the original route file after sorting by vehicle departure time
+- `--od_input`: *(required for single_od_run)* Folder identifier, e.g., `od_1ramp_csv` or `od_2092_609_386_values`
 
+  Only for `full_optimization` mode:
+  - `--model_name`: Optimization algorithm name (e.g., `spsa`, `vanillabo`)
+  - `--seed`: Integer seed used for the experiment (e.g., `1`)
+  - `--epoch`, `--batch`: Epoch and batch indices of the optimization iteration to visualize
 
-#### Run the visualization script
+#### 📋 Step-by-Step Instructions
+
+1. **Ensure a simulation has already been run**
+
+   This script does not run simulations — it only visualizes existing ones.  
+   Make sure your simulation output exists under `output/`.
+
+   - For `single_od_run`, the folder format is: `output/single_od_run/{date}_{hour}_{eval_measure}_{routes_per_od}_{od_input}/`
+
+   - For `full_optimization`, the folder format is: `output/full_optimization/network_{network_name}_{model_name}_{date}_{hour}_{eval_measure}_{routes_per_od}_seed-{seed}/`
+
+3. **Run the visualization script**
 
    Use the following command structure:
 
-   ```bash
-   python visualization/results_visualization.py \
+   ```
+   python visualization/sumo_gui_runner.py \
+     --mode ${MODE} \
      --network_name ${NETWORK_NAME} \
      --date ${DATE} \
      --hour ${HOUR} \
-     --eval_measure ${EVAL_MEASURE} \
-     --routes_per_od ${ROUTES_PER_OD} \
-     --max_epoch ${MAX_EPOCH}
+     --od_input ${OD_INPUT} \
+     [--eval_measure ${EVAL_MEASURE}] \
+     [--routes_per_od ${ROUTES_PER_OD}] \
+     [--model_name ${MODEL_NAME}] \
+     [--seed ${SEED}] \
+     [--epoch ${EPOCH}] \
+     [--batch ${BATCH}] \
+     [--overwrite]
    ```
    
-   Example:
-    
-   ```bash
-   python visualization/results_visualization.py --network_name 1ramp --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --max_epoch 3
-   ```
+   Example
+
+    - Single OD Run:
+
+      ```bash
+      python visualization/sumo_gui_runner.py --mode single_od_run --network_name 1ramp --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --od_input od_1ramp_csv
+      ```
+
+    - Full Optimization:
+
+      ```bash
+      python visualization/sumo_gui_runner.py --mode full_optimization --network_name 1ramp --model_name vanillabo --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --seed 1 --epoch 26 --batch 2
+      ```
 
 #### 📌 Notes
-* The generated plots are in the `visualization/figures` directory.
-* Executing this code will generate the following figure.
+* The script expects only one matching folder for the given input arguments. If multiple or no matches are found, it will raise an error.
+* The simulation must have been run beforehand so that *_routes.vehroutes.xml exists
 
-<p align="center">
-  <img src="assets/example_convergence.png" alt="Convergence Plot" width="280"/>
-  <img src="assets/example_fit.png" alt="Fit to Ground Truth" width="280"/>
-</p>
+</details>
+
+<details>
+<summary><strong>Add New GP Kernel</strong></summary>
+
+Use this script to visually inspect the simulation results using the SUMO GUI. It works for both full optimization and single OD run experiments.
+
+#### 🔧 Argument Details
+- `--mode`: One of `["single_od_run", "full_optimization"]`
+- `--network_name`: Name of the network scenario (e.g., `1ramp`)
+- `--date`: Simulation date in `yymmdd` format (e.g., `221014`)
+- `--hour`: Time window of the experiment (e.g., `08-09`)
+- `--eval_measure`: Link-level measurement used for evaluation; choose between `count` (default) for vehicle counts, or `speed` for vehicle speeds (mph)
+- `--routes_per_od`: Type of routes to use for the simulation; choose between `single` (default) for one representative route per OD pair, or `multiple` for multiple precomputed routes per OD pair
+- `--overwrite`: If set, overwrites the original route file after sorting by vehicle departure time
+- `--od_input`: *(required for single_od_run)* Folder identifier, e.g., `od_1ramp_csv` or `od_2092_609_386_values`
+
+  Only for `full_optimization` mode:
+  - `--model_name`: Optimization algorithm name (e.g., `spsa`, `vanillabo`)
+  - `--seed`: Integer seed used for the experiment (e.g., `1`)
+  - `--epoch`, `--batch`: Epoch and batch indices of the optimization iteration to visualize
+
+#### 📋 Step-by-Step Instructions
+
+1. **Ensure a simulation has already been run**
+
+   This script does not run simulations — it only visualizes existing ones.  
+   Make sure your simulation output exists under `output/`.
+
+   - For `single_od_run`, the folder format is: `output/single_od_run/{date}_{hour}_{eval_measure}_{routes_per_od}_{od_input}/`
+
+   - For `full_optimization`, the folder format is: `output/full_optimization/network_{network_name}_{model_name}_{date}_{hour}_{eval_measure}_{routes_per_od}_seed-{seed}/`
+
+3. **Run the visualization script**
+
+   Use the following command structure:
+
+   ```
+   python visualization/sumo_gui_runner.py \
+     --mode ${MODE} \
+     --network_name ${NETWORK_NAME} \
+     --date ${DATE} \
+     --hour ${HOUR} \
+     --od_input ${OD_INPUT} \
+     [--eval_measure ${EVAL_MEASURE}] \
+     [--routes_per_od ${ROUTES_PER_OD}] \
+     [--model_name ${MODEL_NAME}] \
+     [--seed ${SEED}] \
+     [--epoch ${EPOCH}] \
+     [--batch ${BATCH}] \
+     [--overwrite]
+   ```
+   
+   Example
+
+    - Single OD Run:
+
+      ```bash
+      python visualization/sumo_gui_runner.py --mode single_od_run --network_name 1ramp --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --od_input od_1ramp_csv
+      ```
+
+    - Full Optimization:
+
+      ```bash
+      python visualization/sumo_gui_runner.py --mode full_optimization --network_name 1ramp --model_name vanillabo --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --seed 1 --epoch 26 --batch 2
+      ```
+
+#### 📌 Notes
+* The script expects only one matching folder for the given input arguments. If multiple or no matches are found, it will raise an error.
+* The simulation must have been run beforehand so that *_routes.vehroutes.xml exists
 
 </details>

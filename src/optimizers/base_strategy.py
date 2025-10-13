@@ -23,6 +23,6 @@ class BaseStrategy(ABC):
         pass
 
     @abstractmethod
-    def suggest(self, X_all_fullD_norm, Y_all_real, epoch, seed):
+    def suggest(self, X_all_fullD_norm, Y_all_real, kernel, epoch, seed):
         """Suggest new candidates. Returns X_new_fullD_real (np.ndarray)."""
         pass

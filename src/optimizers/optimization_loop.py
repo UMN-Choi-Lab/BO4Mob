@@ -19,6 +19,7 @@ from utils.misc import set_seed
 def run_optimization_loop(
     config,
     model_name,
+    kernel,
     dim_od,
     params,
     bounds,
@@ -47,6 +48,8 @@ def run_optimization_loop(
         Configuration dictionary for simulation and optimization.
     model_name : str
         Key for selecting the optimization strategy from the registry.
+    kernel : str
+        Kernel type for the GP model (e.g., 'matern-1.5', 'matern-2.5', 'rbf', 'None').
     dim_od : int
         Dimension of the OD (origin-destination) variables.
     params : dict
@@ -137,7 +140,7 @@ def run_optimization_loop(
 
         model_run_time_start = time.time()
         X_all_fullD_norm = normalize(X_all_fullD_real, bounds)
-        X_new_fullD_real = strategy.suggest(X_all_fullD_norm, Y_all_real, epoch=i, seed=seed_i)
+        X_new_fullD_real = strategy.suggest(X_all_fullD_norm, Y_all_real, kernel, epoch=i, seed=seed_i)
         model_run_time = time.time() - model_run_time_start
 
         model_run_time_new_row = pd.DataFrame(

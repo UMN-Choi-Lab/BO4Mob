@@ -155,7 +155,7 @@ class TurboStrategy(BaseStrategy):
         """Initialize TuRBO state based on input dimensionality and batch size."""
         self.state = TurboState(dim=X_init.shape[1], batch_size=self.params["bo_batch_size"])
 
-    def suggest(self, X_all_fullD_norm, Y_all_real, epoch, seed):
+    def suggest(self, X_all_fullD_norm, Y_all_real, kernel, epoch, seed):
         """
         Suggest new candidates using the current TuRBO state and GP surrogate model.
 
@@ -177,7 +177,7 @@ class TurboStrategy(BaseStrategy):
         """
         print(f"X_all_fullD_norm: {X_all_fullD_norm}")
 
-        gp_model = initialize_model("turbo", X_all_fullD_norm, Y_all_real)
+        gp_model = initialize_model("turbo", X_all_fullD_norm, Y_all_real, kernel=kernel)
         mll = ExactMarginalLogLikelihood(gp_model.likelihood, gp_model)
 
         with max_cholesky_size(self.params["cholesky_limit"]):

@@ -171,6 +171,7 @@ def main():
     )
     if parser.parse_known_args()[0].mode == "full_optimization":
         parser.add_argument("--model_name", type=str, required=True, help="Name of the model")
+        parser.add_argument("--kernel", type=str, required=True, help="Kernel type used in the model")
         parser.add_argument("--seed", type=int, required=True, help="Seed value (e.g., 42)")
         parser.add_argument("--epoch", type=int, required=True, help="Epoch index (e.g., 1)")
         parser.add_argument("--batch", type=int, required=True, help="Batch index (e.g., 1)")
@@ -233,6 +234,7 @@ def main():
             if (
                 f'network_{args.network_name}' in folder.name
                 and args.model_name in folder.name
+                and args.kernel in folder.name
                 and str(args.date) in folder.name
                 and args.hour in folder.name
                 and args.eval_measure in folder.name
@@ -254,7 +256,7 @@ def main():
             raise FileNotFoundError(
                 (
                     f"Expected exactly one folder containing '{args.network_name}', "
-                    f"'{args.model_name}', '{args.date}', '{args.hour}', "
+                    f"'{args.model_name}', '{args.kernel}', '{args.date}', '{args.hour}', "
                     f"'{args.eval_measure}', '{args.routes_per_od}', and 'seed-{args.seed:02d}', "
                     f"but found {len(matching_folders)}."
                 )

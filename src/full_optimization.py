@@ -97,6 +97,7 @@ def main():
         default="spsa",
         choices=["initSearch", "spsa", "vanillabo", "saasbo", "turbo"],
     )
+    parser.add_argument("--kernel", type=str, default="matern-2.5", choices=["matern-1p5", "matern-2p5", "rbf", "none"])
     parser.add_argument("--seed", type=int, default=33, help="Random seed for reproducibility")
     parser.add_argument("--date", type=int, default=221014, help="Date for simulation")
     parser.add_argument(
@@ -136,6 +137,7 @@ def main():
     date = args.date
     hour = args.hour
     model_name = args.model_name
+    kernel = args.kernel
     network_name = args.network_name
     eval_measure = args.eval_measure
     routes_per_od = args.routes_per_od
@@ -146,7 +148,8 @@ def main():
     # =====================
     config = load_config_full_opt(
         base_path,
-        model_name=args.model_name,
+        model_name=model_name,
+        kernel=kernel,
         config_file_name=f"sim_setup_network_{args.network_name}.json",
     )
     pprint.pprint(dict(config))
@@ -237,6 +240,7 @@ def main():
         data_set_total, sensor_measure_simul = run_optimization_loop(
             config=config,
             model_name=model_name,
+            kernel=kernel,
             dim_od=dim_od,
             params=params,
             bounds=bounds,
