@@ -599,71 +599,106 @@ Use this script to visually inspect the simulation results using the SUMO GUI. I
 <details>
 <summary><strong>Add New BO Method</strong></summary>
 
-Use this script to visually inspect the simulation results using the SUMO GUI. It works for both full optimization and single OD run experiments.
+To add a custom BO method, follow the three main steps below:
 
-#### 🔧 Argument Details
-- `--mode`: One of `["single_od_run", "full_optimization"]`
-- `--network_name`: Name of the network scenario (e.g., `1ramp`)
-- `--date`: Simulation date in `yymmdd` format (e.g., `221014`)
-- `--hour`: Time window of the experiment (e.g., `08-09`)
-- `--eval_measure`: Link-level measurement used for evaluation; choose between `count` (default) for vehicle counts, or `speed` for vehicle speeds (mph)
-- `--routes_per_od`: Type of routes to use for the simulation; choose between `single` (default) for one representative route per OD pair, or `multiple` for multiple precomputed routes per OD pair
-- `--overwrite`: If set, overwrites the original route file after sorting by vehicle departure time
-- `--od_input`: *(required for single_od_run)* Folder identifier, e.g., `od_1ramp_csv` or `od_2092_609_386_values`
+#### Step 1. Define Your Method Name
 
-  Only for `full_optimization` mode:
-  - `--model_name`: Optimization algorithm name (e.g., `spsa`, `vanillabo`)
-  - `--seed`: Integer seed used for the experiment (e.g., `1`)
-  - `--epoch`, `--batch`: Epoch and batch indices of the optimization iteration to visualize
+Choose a unique name (e.g., `mybo`) for your BO method.
 
-#### 📋 Step-by-Step Instructions
+This name will be passed to the `--model_name` argument when running the benchmark, just like other existing methods such as `vanillabo`, `turbo`, or `turbo`.
 
-1. **Ensure a simulation has already been run**
+#### Step 2. Implement Your BO Logic
 
-   This script does not run simulations — it only visualizes existing ones.  
-   Make sure your simulation output exists under `output/`.
+To define a new Bayesian Optimization method, you’ll need to implement three components:
 
-   - For `single_od_run`, the folder format is: `output/single_od_run/{date}_{hour}_{eval_measure}_{routes_per_od}_{od_input}/`
+* **(1) Create the optimization strategy file**
 
-   - For `full_optimization`, the folder format is: `output/full_optimization/network_{network_name}_{model_name}_{date}_{hour}_{eval_measure}_{routes_per_od}_seed-{seed}/`
+  Add a new Python file to the optimizer module:
+  ```
+  src/optimizers/mybo.py
+  ```
 
-3. **Run the visualization script**
+  This file must define:
 
-   Use the following command structure:
+  - A Strategy class (e.g., MyBOStrategy) that inherits from BaseStrategy
+  - An optimize_acqf_and_create_candidate(...) function that generates candidate points
 
-   ```
-   python visualization/sumo_gui_runner.py \
-     --mode ${MODE} \
-     --network_name ${NETWORK_NAME} \
-     --date ${DATE} \
-     --hour ${HOUR} \
-     --od_input ${OD_INPUT} \
-     [--eval_measure ${EVAL_MEASURE}] \
-     [--routes_per_od ${ROUTES_PER_OD}] \
-     [--model_name ${MODEL_NAME}] \
-     [--seed ${SEED}] \
-     [--epoch ${EPOCH}] \
-     [--batch ${BATCH}] \
-     [--overwrite]
-   ```
-   
-   Example
+  Reference: `vanillabo.py`, `saasbo.py`, `turbo.py`
 
-    - Single OD Run:
+* **(2) Register GP initialization logic**
 
-      ```bash
-      python visualization/sumo_gui_runner.py --mode single_od_run --network_name 1ramp --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --od_input od_1ramp_csv
-      ```
+  If your method uses a GP model, you need to define how the GP is initialized by editing:
+  ```
+  src/models/gp_models.py
+  ```
 
-    - Full Optimization:
+  - Add a function like `initialize_mybo_model()`
+  - Then update the dispatcher function `initialize_model()`
 
-      ```bash
-      python visualization/sumo_gui_runner.py --mode full_optimization --network_name 1ramp --model_name vanillabo --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --seed 1 --epoch 26 --batch 2
-      ```
+  Reference: `initialize_vanillabo_model()`, `initialize_saasbo_model()`, and `initialize_turbo_model()`
 
-#### 📌 Notes
-* The script expects only one matching folder for the given input arguments. If multiple or no matches are found, it will raise an error.
-* The simulation must have been run beforehand so that *_routes.vehroutes.xml exists
+
+* **(3) Define model-specific hyperparameters**
+
+  Declare method-specific parameters inside:
+  ```
+  src/utils/params.py
+  ```
+
+  Inside `get_params(...)`, add an entry under the `model_specific` dictionary:
+  ```
+  "mybo": lambda: {
+    "bo_batch_size": config["bo_batch_size"],
+    "bo_num_restarts": config["bo_num_restarts"],
+    "bo_raw_samples": config["bo_raw_samples"],
+    ...
+  }
+  ```
+
+
+#### Step 3. Register and Enable in Pipeline
+
+Your method now needs to be registered in the main benchmark pipeline.
+
+* **(1) Register the strategy**
+
+  Open:
+  ```
+  src/optimizers/strategy_registry.py
+  ```
+
+  Add an import and map your method name to the new strategy class:
+  ```
+  from optimizers.mybo import MyBOStrategy
+
+  strategy_registery = {
+      ...
+      "mybo": MyBOStrategy,
+  }
+  ```
+
+* **(2) Enable command-line interface**
+
+  Open:
+  ```
+  src/full_optimization.py
+  ```
+
+  Update the argument parser for `--model_name` to include your new method:
+  ```
+  parser.add_argument(
+      "--model_name",
+      type=str,
+      default="spsa",
+      choices=["initSearch", "spsa", "vanillabo", "saasbo", "turbo", "mybo"],
+  )
+  ```
+
+  This makes your strategy callable via the CLI:
+  ```
+  python src/full_optimization.py --model_name mybo ...
+  ```
+
 
 </details>
 
