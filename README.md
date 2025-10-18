@@ -569,6 +569,8 @@ If not, you can generate one from OpenStreetMap (OSM):
 * (1) **Export OSM file**  
    Go to [OpenStreetMap](https://www.openstreetmap.org/), zoom into your target area, and **Export** the map as an `.osm` file.  
 * (2) **Convert to SUMO format**  
+  Required to download [SUMO](https://sumo.dlr.de/docs/Downloads.php)
+
   ```bash
   netconvert --osm-files export.osm -o my_network.xml
   ```
@@ -587,6 +589,9 @@ Prepare vehicle count (flow) data that can be matched to your network links.
 	(Optionally) road type, number of lanes, traffic direction
 
 These fields will help accurately map your sensors to the SUMO network edges.
+
+Please make sure your data format follows the same structure as this example file:
+Example: `sensor_data/221014/gt_link_data_1ramp_221014_08-09.csv`
 
 
 </details>
