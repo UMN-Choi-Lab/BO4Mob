@@ -528,71 +528,66 @@ This script allows you to generate **convergence plots** and visualize **the fit
 <details>
 <summary><strong>Add New Traffic Network</strong></summary>
 
-Use this script to visually inspect the simulation results using the SUMO GUI. It works for both full optimization and single OD run experiments.
+This repository provides both the **network file** and the **traffic sensor dataset** matched to that network.  
+If you would like to apply your **own network and sensor data**, this guide explains which parts to modify and how to prepare compatible inputs.
 
-#### 🔧 Argument Details
-- `--mode`: One of `["single_od_run", "full_optimization"]`
-- `--network_name`: Name of the network scenario (e.g., `1ramp`)
-- `--date`: Simulation date in `yymmdd` format (e.g., `221014`)
-- `--hour`: Time window of the experiment (e.g., `08-09`)
-- `--eval_measure`: Link-level measurement used for evaluation; choose between `count` (default) for vehicle counts, or `speed` for vehicle speeds (mph)
-- `--routes_per_od`: Type of routes to use for the simulation; choose between `single` (default) for one representative route per OD pair, or `multiple` for multiple precomputed routes per OD pair
-- `--overwrite`: If set, overwrites the original route file after sorting by vehicle departure time
-- `--od_input`: *(required for single_od_run)* Folder identifier, e.g., `od_1ramp_csv` or `od_2092_609_386_values`
+### How We Prepared the Data
 
-  Only for `full_optimization` mode:
-  - `--model_name`: Optimization algorithm name (e.g., `spsa`, `vanillabo`)
-  - `--seed`: Integer seed used for the experiment (e.g., `1`)
-  - `--epoch`, `--batch`: Epoch and batch indices of the optimization iteration to visualize
+#### Step 1. SUMO Network (XML Format)
+We used the *San Francisco* network from the research dataset [here](https://www.research-collection.ethz.ch/entities/researchdata/c26aff6d-a2fb-45ca-acf2-0cc3cccda049).  
+From this file, we extracted the **San Jose area** using [netedit](https://sumo.dlr.de/docs/Netedit/index.html).  
+Each edge in the SUMO `.xml` file has a unique edge ID.
 
-#### 📋 Step-by-Step Instructions
+#### Step 2. Count Data (Traffic Sensor Data)
+1. **Download the data**  
+   From [Caltrans PeMS](https://pems.dot.ca.gov/?dnode=Clearinghouse):  
+   - Select **“Station 5-Minute”** and **“District 4”**  
+   - Click the files listed under “Available Files” to download
 
-1. **Ensure a simulation has already been run**
+2. **Check data fields**  
+   The dataset includes **sensor IDs**, **latitude/longitude**, **traffic counts (flow)**, and other metadata.
 
-   This script does not run simulations — it only visualizes existing ones.  
-   Make sure your simulation output exists under `output/`.
+#### Step 3. Matching SUMO Network and Sensor Data
+The goal is to match each sensor ID in the PeMS dataset to the corresponding SUMO network link.  
+1. For each sensor’s `(lat, lon)`, find the **10 nearest edges** in the SUMO network.  
+2. Among these, identify matches where the following metadata are consistent:  
+   - (a) traffic direction *(Dir)*  
+   - (b) number of lanes *(Lanes)*  
+   - (c) highway name *(Fwy)*  
+3. Once matched, create a dataset containing `link_id`, `vehicle_count`, and `mean_speed`.  
+   - `link_id` corresponds to **Total Flow**, and `mean_speed` corresponds to **Avg Speed** in the PeMS data.  
+   - Example: `sensor_data/221014/gt_link_data_1ramp_221014_08-09.csv`
 
-   - For `single_od_run`, the folder format is: `output/single_od_run/{date}_{hour}_{eval_measure}_{routes_per_od}_{od_input}/`
 
-   - For `full_optimization`, the folder format is: `output/full_optimization/network_{network_name}_{model_name}_{date}_{hour}_{eval_measure}_{routes_per_od}_seed-{seed}/`
+### Using Your Own Network and Sensor Data
 
-3. **Run the visualization script**
+#### Step 1. Preparing a Network
+If you already have a `.xml` or `.net.xml` network file — you can use it directly.
 
-   Use the following command structure:
+If not, you can generate one from OpenStreetMap (OSM):
 
-   ```
-   python visualization/sumo_gui_runner.py \
-     --mode ${MODE} \
-     --network_name ${NETWORK_NAME} \
-     --date ${DATE} \
-     --hour ${HOUR} \
-     --od_input ${OD_INPUT} \
-     [--eval_measure ${EVAL_MEASURE}] \
-     [--routes_per_od ${ROUTES_PER_OD}] \
-     [--model_name ${MODEL_NAME}] \
-     [--seed ${SEED}] \
-     [--epoch ${EPOCH}] \
-     [--batch ${BATCH}] \
-     [--overwrite]
-   ```
-   
-   Example
+1. **Export OSM file**  
+   Go to [OpenStreetMap](https://www.openstreetmap.org/), zoom into your target area, and **Export** the map as an `.osm` file.  
+2. **Convert to SUMO format**  
+    ```bash
+   netconvert --osm-files export.osm -o my_network.xml
+    ```
 
-    - Single OD Run:
+3. **You now have a SUMO-compatible network file.**
 
-      ```bash
-      python visualization/sumo_gui_runner.py --mode single_od_run --network_name 1ramp --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --od_input od_1ramp_csv
-      ```
+#### Step 2. Preparing Sensor Data
 
-    - Full Optimization:
+Prepare vehicle count (flow) data that can be matched to your network links.
 
-      ```bash
-      python visualization/sumo_gui_runner.py --mode full_optimization --network_name 1ramp --model_name vanillabo --date 221014 --hour 08-09 --eval_measure count --routes_per_od multiple --seed 1 --epoch 26 --batch 2
-      ```
+#### Step 3. Matching SUMO Network and Sensor Data
 
-#### 📌 Notes
-* The script expects only one matching folder for the given input arguments. If multiple or no matches are found, it will raise an error.
-* The simulation must have been run beforehand so that *_routes.vehroutes.xml exists
+* If you already have sensor data that aligns with your SUMO network — you’re good to go.
+
+* Otherwise, ensure your dataset includes at least: Latitude / Longitude
+	(Optionally) road type, number of lanes, traffic direction
+
+These fields will help accurately map your sensors to the SUMO network edges.
+
 
 </details>
 
