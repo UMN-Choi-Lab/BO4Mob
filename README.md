@@ -544,14 +544,18 @@ Each link(edge) in the SUMO `.xml` file has a unique ID.
    - Click the files listed under “Available Files” to download
 
   Make a folder named "raw_data" and make folders by month ex) 01, 02, 03, ...
+
   Put the downloaded files in the folders
 
-  Run [this code](https://github.com/UMN-Choi-Lab/PeMS-BAY-2022/blob/master/process.py) to get hourly data from 5-minut data
+  Run [this script](https://github.com/UMN-Choi-Lab/PeMS-BAY-2022/blob/master/process.py) to convert 5-minute data into hourly data:
   ```bash
   python process.py
   ```
+
 * (2) **Check data fields**
+
   The dataset should include statistics by **network type** (e.g., ramp, corridor), **date**, and **hourly time intervals** (e.g., total_flow, avg_speed).
+
   After completing **Step 3**, return to this dataset to filter the sensors you want to use.
 
 #### Step 3. Matching SUMO Network and Sensor Data
@@ -598,12 +602,12 @@ Prepare vehicle count (flow) data that can be matched to your network links.
 * Otherwise, ensure your dataset includes at least: Latitude / Longitude
 	(Optionally) road type, number of lanes, traffic direction
 
-These fields will help accurately map your sensors to the SUMO network edges.
+  These fields will help accurately map your sensors to the SUMO network edges.
 
 Please make sure your data format follows the same structure as this example file:
 
-Network example: `network/{my_network}/net.xml`
-Sensor data example: `sensor_data/{date}/gt_link_data_{my_network}_{date}_{hour}.csv`
+* Network example: `network/{my_network}/net.xml`
+* Sensor data example: `sensor_data/{date}/gt_link_data_{my_network}_{date}_{hour}.csv`
 
 </details>
 
