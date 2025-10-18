@@ -537,16 +537,26 @@ We used the *San Francisco* network from the research dataset [here](https://www
 From this file, we extracted the **San Jose area** using [netedit](https://sumo.dlr.de/docs/Netedit/index.html).  
 Each link(edge) in the SUMO `.xml` file has a unique ID.
 
-#### Step 2. Count Data (Traffic Sensor Data)
-1. **Download the data**  
-   From [Caltrans PeMS](https://pems.dot.ca.gov/?dnode=Clearinghouse):  
+#### Step 2. Hourly Count Data (Traffic Sensor Data)
+* (1) **Download the data**  
+  From [Caltrans PeMS](https://pems.dot.ca.gov/?dnode=Clearinghouse):  
    - Select **“Station 5-Minute”** and **“District 4”**  
    - Click the files listed under “Available Files” to download
 
-2. **Check data fields**  
-   The dataset includes **sensor IDs**, **latitude/longitude**, **traffic counts (flow)**, and other metadata.
+  Make a folder named "raw_data" and make folders by month ex) 01, 02, 03, ...
+  Put the downloaded files in the folders
+
+  Run [this code](https://github.com/UMN-Choi-Lab/PeMS-BAY-2022/blob/master/process.py) to get hourly data from 5-minut data
+  ```bash
+  python process.py
+  ```
+* (2) **Check data fields**
+  The dataset should include statistics by **network type** (e.g., ramp, corridor), **date**, and **hourly time intervals** (e.g., total_flow, avg_speed).
+  After completing **Step 3**, return to this dataset to filter the sensors you want to use.
 
 #### Step 3. Matching SUMO Network and Sensor Data
+
+The raw sensor data does not include information on which SUMO network link each sensor corresponds to.
 The goal is to match each sensor ID in the PeMS dataset to the corresponding SUMO network link.  
 * (1) For each sensor’s `(lat, lon)`, find the **10 nearest edges** in the SUMO network.  
 * (2) Among these, identify matches where the following metadata are consistent:  
@@ -591,8 +601,9 @@ Prepare vehicle count (flow) data that can be matched to your network links.
 These fields will help accurately map your sensors to the SUMO network edges.
 
 Please make sure your data format follows the same structure as this example file:
-Example: `sensor_data/221014/gt_link_data_1ramp_221014_08-09.csv`
 
+Network example: `network/{my_network}/net.xml`
+Sensor data example: `sensor_data/{date}/gt_link_data_{my_network}_{date}_{hour}.csv`
 
 </details>
 
