@@ -705,6 +705,48 @@ Your method now needs to be registered in the main benchmark pipeline.
 <details>
 <summary><strong>Add New GP Kernel</strong></summary>
 
+To add a new GP kernel, follow the three main steps below:
 
+#### Step 1. Define Your Kernel Name
+
+Choose a unique name (e.g., `mykernel`) for new GP kernel.
+
+Open:
+```
+src/models/gp_models.py
+```
+
+
+#### Step 2. Define the Kernel in `gp_models.py`
+
+  Open:
+  ```
+  src/models/gp_models.py
+  ```
+
+  Add your new kernel in the function `set_covar_module`**
+
+  Reference: See `matern-1p5`, `matern-2p5`, `rbf` in `set_covar_module()`
+
+#### Step 3. Enable in Pipeline
+
+  Open:
+  ```
+  src/full_optimization.py
+  ```
+
+  Update the argument parser for `--kernel` to include your new kernel:
+  ```
+  parser.add_argument(
+      "--kernel",
+      type=str,
+      default="matern-2.5",
+      choices=["matern-1p5", "matern-2p5", "rbf", "mykernel", "none"])
+  ```
+
+  This makes your kernel callable via the CLI:
+  ```
+  python src/full_optimization.py --kernel mykernel ...
+  ```
 
 </details>
