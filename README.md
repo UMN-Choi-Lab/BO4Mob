@@ -528,15 +528,14 @@ This script allows you to generate **convergence plots** and visualize **the fit
 <details>
 <summary><strong>Add New Traffic Network</strong></summary>
 
-This repository provides both the **network file** and the **traffic sensor dataset** matched to that network.  
-If you would like to apply your **own network and sensor data**, this guide explains which parts to modify and how to prepare compatible inputs.
+This repository provides both the **network file** and the **traffic sensor dataset** matched to that network. If you would like to apply your **own network and sensor data**, this guide explains which parts to modify and how to prepare compatible inputs.
 
 ### How We Prepared the Data
 
 #### Step 1. SUMO Network (XML Format)
 We used the *San Francisco* network from the research dataset [here](https://www.research-collection.ethz.ch/entities/researchdata/c26aff6d-a2fb-45ca-acf2-0cc3cccda049).  
 From this file, we extracted the **San Jose area** using [netedit](https://sumo.dlr.de/docs/Netedit/index.html).  
-Each edge in the SUMO `.xml` file has a unique edge ID.
+Each link(edge) in the SUMO `.xml` file has a unique ID.
 
 #### Step 2. Count Data (Traffic Sensor Data)
 1. **Download the data**  
@@ -549,14 +548,15 @@ Each edge in the SUMO `.xml` file has a unique edge ID.
 
 #### Step 3. Matching SUMO Network and Sensor Data
 The goal is to match each sensor ID in the PeMS dataset to the corresponding SUMO network link.  
-1. For each sensor’s `(lat, lon)`, find the **10 nearest edges** in the SUMO network.  
-2. Among these, identify matches where the following metadata are consistent:  
-   - (a) traffic direction *(Dir)*  
-   - (b) number of lanes *(Lanes)*  
-   - (c) highway name *(Fwy)*  
-3. Once matched, create a dataset containing `link_id`, `vehicle_count`, and `mean_speed`.  
-   - `link_id` corresponds to **Total Flow**, and `mean_speed` corresponds to **Avg Speed** in the PeMS data.  
-   - Example: `sensor_data/221014/gt_link_data_1ramp_221014_08-09.csv`
+* (1) For each sensor’s `(lat, lon)`, find the **10 nearest edges** in the SUMO network.  
+* (2) Among these, identify matches where the following metadata are consistent:  
+  * traffic direction *(Dir)*  
+  * number of lanes *(Lanes)*  
+  * highway name *(Fwy)*  
+* (3) Once matched, create a dataset containing `link_id`, `vehicle_count`, and `mean_speed`.  
+  * `vehicle_count` corresponds to **Total Flow**, and `mean_speed` corresponds to **Avg Speed** in the PeMS data.
+
+  Example: `sensor_data/221014/gt_link_data_1ramp_221014_08-09.csv`
 
 
 ### Using Your Own Network and Sensor Data
@@ -566,14 +566,14 @@ If you already have a `.xml` or `.net.xml` network file — you can use it direc
 
 If not, you can generate one from OpenStreetMap (OSM):
 
-1. **Export OSM file**  
+* (1) **Export OSM file**  
    Go to [OpenStreetMap](https://www.openstreetmap.org/), zoom into your target area, and **Export** the map as an `.osm` file.  
-2. **Convert to SUMO format**  
-    ```bash
-   netconvert --osm-files export.osm -o my_network.xml
-    ```
+* (2) **Convert to SUMO format**  
+  ```bash
+  netconvert --osm-files export.osm -o my_network.xml
+  ```
 
-3. **You now have a SUMO-compatible network file.**
+* (3) **You now have a SUMO-compatible network file.**
 
 #### Step 2. Preparing Sensor Data
 
