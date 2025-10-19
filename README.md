@@ -387,8 +387,8 @@ This mode runs an initial search followed by model-based optimization (if specif
 #### 📌 Notes
 
 - The available GP kernels depend on the optimization model:  
-  `vanillabo` and `turbo` support `"matern-1.5"`, `"matern-2.5"`, and `"rbf"`;  
-  `saasbo` supports only `"matern-2.5"`;  
+  `vanillabo` and `turbo` support `"matern-1p5"`, `"matern-2p5"`, and `"rbf"`;  
+  `saasbo` supports only `"matern-2p5"`;  
   `spsa` and `initSearch` use `"none"` (no GP kernel).
 - If the initial search has already been completed for the same seed/config, only the model optimization will run.
 - Some large networks (e.g., `4smallRegion`, `5fullRegion`) may require significant memory and CPU resources. Make sure your machine meets the requirements.
@@ -740,7 +740,7 @@ src/models/gp_models.py
   parser.add_argument(
       "--kernel",
       type=str,
-      default="matern-2.5",
+      default="matern-2p5",
       choices=["matern-1p5", "matern-2p5", "rbf", "mykernel", "none"])
   ```
 

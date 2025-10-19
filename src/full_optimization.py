@@ -97,7 +97,7 @@ def main():
         default="spsa",
         choices=["initSearch", "spsa", "vanillabo", "saasbo", "turbo"],
     )
-    parser.add_argument("--kernel", type=str, default="matern-2.5", choices=["matern-1p5", "matern-2p5", "rbf", "none"])
+    parser.add_argument("--kernel", type=str, default="matern-2p5", choices=["matern-1p5", "matern-2p5", "rbf", "none"])
     parser.add_argument("--seed", type=int, default=33, help="Random seed for reproducibility")
     parser.add_argument("--date", type=int, default=221014, help="Date for simulation")
     parser.add_argument(
