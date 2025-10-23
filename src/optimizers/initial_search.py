@@ -27,7 +27,8 @@ def run_initial_search_procedure(
     base_path,
     routes_df,
     routes_per_od,
-    sensor_flow_gt,
+    eval_measure,
+    sensor_measure_gt,
     link_selection,
     path_init_detail,
     path_init_simul,
@@ -69,8 +70,10 @@ def run_initial_search_procedure(
         Route information dataframe.
     routes_per_od : str
         Type of routes to use for the simulation (single or multiple).
-    sensor_flow_gt : pd.DataFrame
-        Ground truth traffic flow data.
+    eval_measure : str
+        Type of evaluation measurement (e.g., 'count', 'speed').
+    sensor_measure_gt : pd.DataFrame
+        Ground truth traffic measurement data.
     link_selection : list[str]
         List of sensor link IDs used in evaluation.
     path_init_detail : Path
@@ -129,7 +132,8 @@ def run_initial_search_procedure(
                             routes_df,
                             routes_per_od,
                             link_selection,
-                            sensor_flow_gt,
+                            eval_measure,
+                            sensor_measure_gt,
                             dim_od,
                         )
                         for i, x in enumerate(X_init_fullD_real.cpu().tolist())

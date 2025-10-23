@@ -102,7 +102,7 @@ class VanillaBOStrategy(BaseStrategy):
         """
         pass  # No internal state needed for Vanilla BO
 
-    def suggest(self, X_all_fullD_norm, Y_all_real, epoch, seed):
+    def suggest(self, X_all_fullD_norm, Y_all_real, kernel, epoch, seed):
         """
         Suggest new candidates using a fitted GP model and acquisition function.
 
@@ -112,6 +112,8 @@ class VanillaBOStrategy(BaseStrategy):
             Normalized input history.
         Y_all_real : torch.Tensor
             Observed objective values.
+        kernel : str
+            Kernel type for the GP model (e.g., 'matern-1.5', 'matern-2.5', 'rbf').
         epoch : int
             Current optimization epoch.
         seed : int
@@ -124,7 +126,7 @@ class VanillaBOStrategy(BaseStrategy):
         """
         best_f = Y_all_real.max()
 
-        gp_model = initialize_model("vanillabo", X_all_fullD_norm, Y_all_real)
+        gp_model = initialize_model("vanillabo", X_all_fullD_norm, Y_all_real, kernel=kernel)
         mll = ExactMarginalLogLikelihood(gp_model.likelihood, gp_model)
 
         with max_cholesky_size(self.params["cholesky_limit"]):

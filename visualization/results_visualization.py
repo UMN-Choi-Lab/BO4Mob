@@ -46,11 +46,17 @@ def main():
         choices=["1ramp", "2corridor", "3junction", "4smallRegion", "5fullRegion"],
     )
     parser.add_argument(
-        "--routes_per_od",
+        "--kernel",
         type=str,
-        default='single',
-        choices=["single", "multiple"],
-        help="Type of routes to use for the simulation",
+        default="matern-2p5",
+        choices=["matern-1p5", "matern-2p5", "rbf"],
+        help="GP kernel type used in the BO model",
+    )
+    parser.add_argument(
+        "--date",
+        type=str,
+        default="221014",
+        help="Date for simulation",
     )
     parser.add_argument(
         "--hour",
@@ -60,11 +66,19 @@ def main():
         help="Time for simulation",
     )
     parser.add_argument(
-        "--date",
+        "--eval_measure",
         type=str,
-        default="221014",
-        help="Date for simulation",
-    )  
+        default="count",
+        choices=["count", "speed"],
+        help="Evaluation measurements"
+    )
+    parser.add_argument(
+        "--routes_per_od",
+        type=str,
+        default='single',
+        choices=["single", "multiple"],
+        help="Type of routes to use for the simulation",
+    )
     parser.add_argument(
         "--max_epoch",
         type=int,
@@ -80,9 +94,11 @@ def main():
     # Set experiment settings
     # =====================
     network_name = args.network_name
-    routes_per_od = args.routes_per_od
-    hour = args.hour
+    kernel = args.kernel
     date = args.date
+    hour = args.hour
+    eval_measure = args.eval_measure
+    routes_per_od = args.routes_per_od
     max_epoch = args.max_epoch
     
     
@@ -93,11 +109,14 @@ def main():
     list_folder_name = [
         folder for folder in folders
         if network_name in folder and
-        routes_per_od in folder and
-        hour in folder and
+        (kernel in folder or 'none' in folder) and
         date in folder and
+        hour in folder and
+        eval_measure in folder and
+        routes_per_od in folder and
         'initSearch' not in folder
     ]
+    print("Selected folders:", list_folder_name)
     
     net_name = f'{network_name}_'
     model_list = [folder.split(net_name)[1].split('_')[0] for folder in list_folder_name if net_name in folder]
@@ -120,10 +139,10 @@ def main():
     }
     
     model_seed_dict = all_data.groupby('Model')['Seed'].apply(list).to_dict()
-    
-    sensor_flow_simul = {
+
+    sensor_measure_simul = {
         (model, seed): pd.read_csv(
-            f'{base_path}/{file_name}/result/sensor_flow_simul.csv'
+            f'{base_path}/{file_name}/result/sensor_measure_simul.csv'
         )[lambda df: df['epoch'] <= max_epoch]
         for file_name, model, seed in model_seed_list
     }
@@ -148,10 +167,11 @@ def main():
     # =====================
     
     plot_fitGT(
+        eval_measure,
         network_name,
         model_seed_dict,
         data_sets,
-        sensor_flow_simul,
+        sensor_measure_simul,
         gt_csv,
         fig_path
     )

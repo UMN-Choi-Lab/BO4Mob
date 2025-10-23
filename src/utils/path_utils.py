@@ -2,7 +2,7 @@
 from pathlib import Path
 
 
-def prepare_run_paths(base_path, date, hour, routes_per_od, seed=None, od_file=None):
+def prepare_run_paths(base_path, date, hour, eval_measure, routes_per_od, seed=None, od_file=None):
     """
     Prepare output directory structure for a simulation run.
 
@@ -35,12 +35,12 @@ def prepare_run_paths(base_path, date, hour, routes_per_od, seed=None, od_file=N
     """
     if seed is None and od_file is not None:
         if od_file.endswith(".csv"):
-            detail_path = Path(f"{base_path}{date}_{hour}_{routes_per_od}_{od_file[:-4]}_csv")
+            detail_path = Path(f"{base_path}{date}_{hour}_{eval_measure}_{routes_per_od}_{od_file[:-4]}_csv")
         else:
-            detail_path = Path(f"{base_path}{date}_{hour}_{routes_per_od}_{od_file}_values")
+            detail_path = Path(f"{base_path}{date}_{hour}_{eval_measure}_{routes_per_od}_{od_file}_values")
     else:
         detail_path = Path(
-            f"{base_path}{date}_{hour}_{routes_per_od}" + (f"_seed-{seed:02d}" if seed is not None else "")
+            f"{base_path}{date}_{hour}_{eval_measure}_{routes_per_od}" + (f"_seed-{seed:02d}" if seed is not None else "")
         )
     simul_path = detail_path / "simulation"
     result_path = detail_path / "result"

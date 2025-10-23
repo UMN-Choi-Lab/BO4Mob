@@ -97,6 +97,7 @@ def main():
         default="spsa",
         choices=["initSearch", "spsa", "vanillabo", "saasbo", "turbo"],
     )
+    parser.add_argument("--kernel", type=str, default="matern-2p5", choices=["matern-1p5", "matern-2p5", "rbf", "none"])
     parser.add_argument("--seed", type=int, default=33, help="Random seed for reproducibility")
     parser.add_argument("--date", type=int, default=221014, help="Date for simulation")
     parser.add_argument(
@@ -105,6 +106,13 @@ def main():
         default="08-09",
         choices=["06-07", "08-09", "17-18"],
         help="Time for simulation",
+    )
+    parser.add_argument(
+        "--eval_measure",
+        type=str,
+        default="count",
+        choices=["count", "speed"],
+        help="Evaluation measurements"
     )
     parser.add_argument(
         "--routes_per_od",
@@ -129,7 +137,9 @@ def main():
     date = args.date
     hour = args.hour
     model_name = args.model_name
+    kernel = args.kernel
     network_name = args.network_name
+    eval_measure = args.eval_measure
     routes_per_od = args.routes_per_od
     cpu_max = args.cpu_max
 
@@ -138,7 +148,8 @@ def main():
     # =====================
     config = load_config_full_opt(
         base_path,
-        model_name=args.model_name,
+        model_name=model_name,
+        kernel=kernel,
         config_file_name=f"sim_setup_network_{args.network_name}.json",
     )
     pprint.pprint(dict(config))
@@ -162,12 +173,12 @@ def main():
         routes_csv = routes_csv.with_name("routes_multiple.csv")
     routes_df = pd.read_csv(routes_csv, index_col=0)
 
-    # Load ground-truth sensor flow data
+    # Load ground-truth sensor measurements
     true_sensor_file_name = f"gt_link_data_{network_name}_{date}_{hour}.csv"
-    sensor_flow_gt = pd.read_csv(base_path + f"/sensor_data/{date}/" + true_sensor_file_name)
+    sensor_measure_gt = pd.read_csv(base_path + f"/sensor_data/{date}/" + true_sensor_file_name)
 
     # Extract the list of links where sensors are located
-    link_selection = sensor_flow_gt["link_id"].tolist()
+    link_selection = sensor_measure_gt["link_id"].tolist()
     print(f"Number of sensors: {len(link_selection)}")
 
     # =====================
@@ -188,12 +199,12 @@ def main():
 
     # Set up initial search paths
     path_init_detail, path_init_simul, path_init_result, init_existence = prepare_run_paths(
-        config["path_init"], date, hour, routes_per_od, seed
+        config["path_init"], date, hour, eval_measure, routes_per_od, seed
     )
 
     # Set up optimization paths
     path_opt_detail, path_opt_simul, path_opt_result, _ = prepare_run_paths(
-        config["path_opt"], date, hour, routes_per_od, seed
+        config["path_opt"], date, hour, eval_measure, routes_per_od, seed
     )
 
     # =====================
@@ -215,7 +226,8 @@ def main():
         base_path=base_path,
         routes_df=routes_df,
         routes_per_od=routes_per_od,
-        sensor_flow_gt=sensor_flow_gt,
+        eval_measure=eval_measure,
+        sensor_measure_gt=sensor_measure_gt,
         link_selection=link_selection,
         path_init_detail=path_init_detail,
         path_init_simul=path_init_simul,
@@ -225,9 +237,10 @@ def main():
 
     # Run optimization loop
     if model_name != "initSearch":
-        data_set_total, sensor_flow_simul = run_optimization_loop(
+        data_set_total, sensor_measure_simul = run_optimization_loop(
             config=config,
             model_name=model_name,
+            kernel=kernel,
             dim_od=dim_od,
             params=params,
             bounds=bounds,
@@ -240,7 +253,8 @@ def main():
             base_path=base_path,
             routes_df=routes_df,
             routes_per_od=routes_per_od,
-            sensor_flow_gt=sensor_flow_gt,
+            eval_measure=eval_measure,
+            sensor_measure_gt=sensor_measure_gt,
             link_selection=link_selection,
             path_opt_simul=path_opt_simul,
             path_opt_result=path_opt_result,
@@ -250,9 +264,10 @@ def main():
         # Result visualization
         save_convergence_plot(data_set_total, path_opt_detail)
         save_fit_to_gt_plots(
+            eval_measure,
             data_set_total,
-            sensor_flow_simul,
-            sensor_flow_gt,
+            sensor_measure_simul,
+            sensor_measure_gt,
             path_opt_detail,
             network_name,
         )

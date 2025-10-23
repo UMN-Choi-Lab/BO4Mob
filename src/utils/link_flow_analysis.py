@@ -41,7 +41,7 @@ def parse_link_flow_xml_to_pandas(
         - Raw interval-level DataFrame
         - Path to the saved CSV file
     """
-    output_file = Path(base_dir) / f"{prefix_output}_link_flow.csv"
+    output_file = Path(base_dir) / f"{prefix_output}_link_measurements.csv"
 
     root = ET.parse(sim_link_file).getroot()
     data = []
@@ -65,7 +65,7 @@ def parse_link_flow_xml_to_pandas(
                 "interval_end": interval_end,
                 "interval_id": interval_id,
                 "link_id": link_id,
-                "link_speed": float(speed_str) if speed_str is not None else 0.0,
+                "link_speed": float(speed_str)*2.23694 if speed_str is not None else 0.0,
                 "link_arrived": float(arrived_str) if arrived_str is not None else 0.0,
                 "link_left": float(left_str) if left_str is not None else 0.0,
             }
@@ -103,16 +103,20 @@ def parse_link_flow_xml_to_pandas(
     return df_agg, df_trips, output_file
 
 
-def compute_nrmse_counts_all_links(df_true: pd.DataFrame, df_simulated: pd.DataFrame) -> float:
+def compute_nrmse_all_links(eval_measure: str, df_true: pd.DataFrame, df_simulated: pd.DataFrame) -> float:
     """
     Compute NRMSE (Normalized Root Mean Squared Error) between simulated and ground truth link flows.
 
     Parameters
     ----------
+    eval_measure : str
+        Type of evaluation measurement (e.g., 'count', 'speed').
     df_true : pd.DataFrame
-        DataFrame containing ground truth link flows with column 'interval_nVehContrib'.
+        DataFrame containing ground truth link measurements with column 'interval_nVehContrib'
+        or 'interval_harmonicMeanSpeed' depending on eval_measure.
     df_simulated : pd.DataFrame
-        DataFrame containing simulated link flows with column 'interval_nVehContrib'.
+        DataFrame containing simulated link measurements with column 'interval_nVehContrib'
+        or 'interval_harmonicMeanSpeed' depending on eval_measure.
 
     Returns
     -------
@@ -123,15 +127,18 @@ def compute_nrmse_counts_all_links(df_true: pd.DataFrame, df_simulated: pd.DataF
     df_true["link_id"] = df_true["link_id"].astype(str)
     df_simulated["link_id"] = df_simulated["link_id"].astype(str)
     df_merged = df_true.merge(df_simulated, on="link_id", suffixes=("_GT", "_sim"), how="left")
-
-    # Fill missing simulated values with 0
-    df_merged["interval_nVehContrib_sim"] = df_merged["interval_nVehContrib_sim"].fillna(0)
-
-    # Compute squared differences
-    df_merged["diff_square"] = (df_merged["interval_nVehContrib_GT"] - df_merged["interval_nVehContrib_sim"]) ** 2
-
     n = df_merged.shape[0]
 
-    nrmse: float = np.sqrt(n * df_merged["diff_square"].sum()) / df_merged["interval_nVehContrib_GT"].sum()
+    # Fill missing simulated values with 0 & compute squared differences
+    if eval_measure == 'count':
+        df_merged["interval_nVehContrib_sim"] = df_merged["interval_nVehContrib_sim"].fillna(0)
+        df_merged["diff_square"] = (df_merged["interval_nVehContrib_GT"] - df_merged["interval_nVehContrib_sim"]) ** 2
+        nrmse: float = np.sqrt(n * df_merged["diff_square"].sum()) / df_merged["interval_nVehContrib_GT"].sum()
+    elif eval_measure == 'speed':
+        df_merged["interval_harmonicMeanSpeed_sim"] = df_merged["interval_harmonicMeanSpeed_sim"].fillna(0)
+        df_merged["diff_square"] = (df_merged["interval_harmonicMeanSpeed_GT"] - df_merged["interval_harmonicMeanSpeed_sim"]) ** 2
+        nrmse: float = np.sqrt(n * df_merged["diff_square"].sum()) / df_merged["interval_harmonicMeanSpeed_GT"].sum()
+    else:
+        raise ValueError(f"Unsupported eval_measure: {eval_measure}")
 
     return nrmse

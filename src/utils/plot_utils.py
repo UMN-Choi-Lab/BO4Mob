@@ -29,23 +29,34 @@ def save_convergence_plot(data_set_total, path_opt_detail):
     plt.close()
 
 
-def save_fit_to_gt_plots(data_set_total, sensor_flow_simul, sensor_flow_gt, path_opt_detail, network_name):
+def save_fit_to_gt_plots(eval_measure, data_set_total, sensor_measure_simul, sensor_measure_gt, path_opt_detail, network_name):
     """
     Save fit-to-ground-truth scatter and bar plots for each epoch's best result.
 
     Parameters
     ----------
+    eval_measure : str
+        Evaluation measure used for optimization (e.g., 'count', 'speed').
     data_set_total : pd.DataFrame
         Full dataset containing simulation results.
-    sensor_flow_simul : pd.DataFrame
-        Simulated sensor link flow data.
-    sensor_flow_gt : pd.DataFrame
-        Ground truth sensor link flow data.
+    sensor_measure_simul : pd.DataFrame
+        Simulated sensor measurements.
+    sensor_measure_gt : pd.DataFrame
+        Ground truth sensor measurements.
     path_opt_detail : Path
         Path to save plots.
     network_name : str
         Name of the network (e.g., '1ramp').
     """
+
+    col_name = (
+        "interval_nVehContrib"
+        if eval_measure == "count"
+        else "interval_harmonicMeanSpeed"
+        if eval_measure == "speed"
+        else None
+    )
+
     path_figs = path_opt_detail / "figs"
     path_figs.mkdir(parents=True, exist_ok=True)
 
@@ -62,44 +73,45 @@ def save_fit_to_gt_plots(data_set_total, sensor_flow_simul, sensor_flow_gt, path
             curr_epoch = int(row["epoch"])
             curr_batch = int(row["batch"])  # noqa: F841
 
-            curr_sensor_flow_simul = sensor_flow_simul.query("epoch == @curr_epoch and batch == @curr_batch")[
-                ["link_id", "interval_nVehContrib"]
+            curr_sensor_measure_simul = sensor_measure_simul.query("epoch == @curr_epoch and batch == @curr_batch")[
+                ["link_id", col_name]
             ]
 
-            sensor_flow_merged = sensor_flow_gt.merge(
-                curr_sensor_flow_simul,
+            sensor_measure_merged = sensor_measure_gt.merge(
+                curr_sensor_measure_simul,
                 on="link_id",
                 how="left",
                 suffixes=("_gt", "_simul"),
             )
 
             max_val = max(
-                sensor_flow_merged.interval_nVehContrib_gt.max(),
-                sensor_flow_merged.interval_nVehContrib_simul.max(),
+                sensor_measure_merged[col_name + "_gt"].max(),
+                sensor_measure_merged[col_name + "_simul"].max(),
             )
+            
             vec = np.arange(max_val)
 
             plt.figure()
             plt.plot(vec, vec, "r-")
             plt.plot(
-                sensor_flow_merged.interval_nVehContrib_gt,
-                sensor_flow_merged.interval_nVehContrib_simul,
+                sensor_measure_merged[col_name + "_gt"],
+                sensor_measure_merged[col_name + "_simul"],
                 "x",
             )
             plt.title(f"Epoch {curr_epoch}, Loss: {row['loss']:.4f}")
-            plt.xlabel("GT link flows")
-            plt.ylabel("Simulated link flows")
-            plt.savefig(path_figs / f"{curr_epoch}_fit_to_GT_link_flows.png")
+            plt.xlabel(f"GT link measurements ({eval_measure})")
+            plt.ylabel(f"Simulated link measurements ({eval_measure})")
+            plt.savefig(path_figs / f"{curr_epoch}_fit_to_GT_link_measurements.png")
             plt.close()
 
-            if network_name == "1ramp" and all(link_id in sensor_flow_gt["link_id"].values for link_id in ["848489711", "848489712", "95265016#1"]):
+            if network_name == "1ramp" and all(link_id in sensor_measure_gt["link_id"].values for link_id in ["848489711", "848489712", "95265016#1"]):
                 gt_od_vals = np.array(
                     [
-                        sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],
-                        sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "848489712", "interval_nVehContrib"].values[0]
-                        - sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],
-                        sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "95265016#1", "interval_nVehContrib"].values[0]
-                        - sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],
+                        sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489711", col_name].values[0],
+                        sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489712", col_name].values[0]
+                        - sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489711", col_name].values[0],
+                        sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "95265016#1", col_name].values[0]
+                        - sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489711", col_name].values[0],
                     ]
                 )
                 curr_od = (
@@ -127,15 +139,17 @@ def save_fit_to_gt_plots(data_set_total, sensor_flow_simul, sensor_flow_gt, path
         f.write(f"Lowest NRMSE observed at epoch: {best_epoch}, batch: {best_batch}, NRMSE: {best_NRMSE:.4f}")
 
 
-def save_fit_to_gt_plots_single_run(x, sensor_flow_gt, curr_link_stats, path_run_detail, network_name):
+def save_fit_to_gt_plots_single_run(eval_measure, x, sensor_measure_gt, curr_link_stats, path_run_detail, network_name):
     """
     Save plots comparing simulation results from a single run to ground truth.
 
     Parameters
     ----------
+    eval_measure : str
+        Evaluation measure used for optimization (e.g., 'count', 'speed').
     x : np.ndarray
         Simulated OD values.
-    sensor_flow_gt : pd.DataFrame
+    sensor_measure_gt : pd.DataFrame
         Ground truth sensor data.
     curr_link_stats : pd.DataFrame
         Simulated sensor data.
@@ -144,23 +158,30 @@ def save_fit_to_gt_plots_single_run(x, sensor_flow_gt, curr_link_stats, path_run
     network_name : str
         Name of the network (e.g., '1ramp').
     """
+    col_name = (
+        "interval_nVehContrib"
+        if eval_measure == "count"
+        else "interval_harmonicMeanSpeed"
+        if eval_measure == "speed"
+        else None
+    )
     path_figs = path_run_detail / "figs"
     path_figs.mkdir(parents=True, exist_ok=True)
 
-    sensor_flow_gt_sorted = sensor_flow_gt.sort_values(by="link_id").reset_index(drop=True)
+    sensor_measure_gt_sorted = sensor_measure_gt.sort_values(by="link_id").reset_index(drop=True)
     curr_link_stats_sorted = curr_link_stats.sort_values(by="link_id").reset_index(drop=True)
 
-    if len(sensor_flow_gt_sorted) != len(curr_link_stats_sorted):
+    if len(sensor_measure_gt_sorted) != len(curr_link_stats_sorted):
         raise ValueError("Mismatch in the number of rows between ground truth and simulated data.")
 
-    if not sensor_flow_gt_sorted["link_id"].equals(curr_link_stats_sorted["link_id"]):
+    if not sensor_measure_gt_sorted["link_id"].equals(curr_link_stats_sorted["link_id"]):
         raise ValueError("Mismatch in link_id values between ground truth and simulated data.")
 
     max_val = max(
         0,
         max(
-            sensor_flow_gt_sorted["interval_nVehContrib"].max(),
-            curr_link_stats_sorted["interval_nVehContrib"].max(),
+            sensor_measure_gt_sorted[col_name].max(),
+            curr_link_stats_sorted[col_name].max(),
         ),
     )
     vec = np.arange(max_val)
@@ -168,24 +189,24 @@ def save_fit_to_gt_plots_single_run(x, sensor_flow_gt, curr_link_stats, path_run
     plt.figure()  # figsize=(10, 6)
     plt.plot(vec, vec, "r-")
     plt.plot(
-        sensor_flow_gt_sorted["interval_nVehContrib"],
-        curr_link_stats_sorted["interval_nVehContrib"],
+        sensor_measure_gt_sorted[col_name],
+        curr_link_stats_sorted[col_name],
         "x",
     )
-    plt.xlabel("GT link flows")
-    plt.ylabel("Simulated link flows")
-    plt.title("Scatter Plot of Ground Truth vs Simulated Link Flows")
-    plt.savefig(path_figs / "fit_to_GT_link_flows.png")
+    plt.xlabel(f"GT link measurements ({eval_measure})")
+    plt.ylabel(f"Simulated link measurements ({eval_measure})")
+    plt.title("Scatter Plot of Ground Truth vs Simulated Link Measurements")
+    plt.savefig(path_figs / "fit_to_GT_link_measurements.png")
     plt.close()
 
-    if network_name == "1ramp" and all(link_id in sensor_flow_gt["link_id"].values for link_id in ["848489711", "848489712", "95265016#1"]):
+    if network_name == "1ramp" and all(link_id in sensor_measure_gt["link_id"].values for link_id in ["848489711", "848489712", "95265016#1"]):
         gt_od_vals = np.array(
             [
-                sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],
-                sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "848489712", "interval_nVehContrib"].values[0]
-                - sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],
-                sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "95265016#1", "interval_nVehContrib"].values[0]
-                - sensor_flow_gt.loc[sensor_flow_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],
+                sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],
+                sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489712", "interval_nVehContrib"].values[0]
+                - sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],
+                sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "95265016#1", "interval_nVehContrib"].values[0]
+                - sensor_measure_gt.loc[sensor_measure_gt["link_id"] == "848489711", "interval_nVehContrib"].values[0],
             ]
         )
 

@@ -6,6 +6,9 @@ __pycache__/
 # Output results
 output/
 
+# Visualization results
+visualization/figures/
+
 # Virtual environments
 .venv/
 env/

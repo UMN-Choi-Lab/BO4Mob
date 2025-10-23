@@ -1,4 +1,4 @@
-link_id,interval_nVehContrib
-848489711,2563.0
-848489712,2569.0
-95265016#1,2591.0
+link_id,interval_nVehContrib,interval_harmonicMeanSpeed
+848489711,2563.0,66.65
+848489712,2569.0,62.4333
+95265016#1,2591.0,63.8333

@@ -36,7 +36,7 @@ class SAASBOStrategy(BaseStrategy):
         """Initialize the strategy with initial data."""
         pass  # No internal state needed for SAASBO
 
-    def suggest(self, X_all_fullD_norm, Y_all_real, epoch, seed):
+    def suggest(self, X_all_fullD_norm, Y_all_real, kernel, epoch, seed):
         """
         Suggest new candidates using the SAASBO acquisition function.
 
@@ -59,7 +59,7 @@ class SAASBOStrategy(BaseStrategy):
         best_f = Y_all_real.max()
 
         # Initialize SAASBO model
-        gp_model = initialize_model("saasbo", X_all_fullD_norm, Y_all_real)
+        gp_model = initialize_model("saasbo", X_all_fullD_norm, Y_all_real, kernel=kernel)
 
         # Fit model using NUTS sampler
         fit_fully_bayesian_model_nuts(

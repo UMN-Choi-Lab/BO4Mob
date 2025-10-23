@@ -10,7 +10,7 @@ from typing import Union
 import pandas as pd
 
 
-def load_config_full_opt(base_path: str, model_name: str, config_file_name: str) -> dict:
+def load_config_full_opt(base_path: str, model_name: str, kernel: str, config_file_name: str) -> dict:
     """Load and format full optimization simulation configuration into a flat dictionary."""
     config_path = Path(base_path, "config")
     sim_setup = json.load(open(config_path / config_file_name))
@@ -20,6 +20,7 @@ def load_config_full_opt(base_path: str, model_name: str, config_file_name: str)
     # Basic identifiers
     kwargs_config["network_name"] = sim_setup["network_name"]
     kwargs_config["model_name"] = model_name
+    kwargs_config["kernel"] = kernel
 
     # Paths to SUMO network-related files
     kwargs_config["network_path"] = Path("network", sim_setup["network_name"])
@@ -31,9 +32,12 @@ def load_config_full_opt(base_path: str, model_name: str, config_file_name: str)
     kwargs_config["link_selection_txt"] = Path(base_path, kwargs_config["network_path"], "link_selection.txt")
 
     # Output directory
-    kwargs_config["path_opt"] = (
-        f"output/full_optimization/{kwargs_config['network_name']}_{kwargs_config['model_name']}_"
-    )
+    if model_name == "initSearch":
+        kwargs_config["path_opt"] = f"output/full_optimization/{kwargs_config['network_name']}_initSearch_"
+    else:
+        kwargs_config["path_opt"] = (
+            f"output/full_optimization/{kwargs_config['network_name']}_{kwargs_config['model_name']}_{kwargs_config['kernel']}_"
+        )
     kwargs_config["path_init"] = f"output/full_optimization/{kwargs_config['network_name']}_initSearch_"
 
     # Simulation output file names

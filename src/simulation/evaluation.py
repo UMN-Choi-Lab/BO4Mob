@@ -9,7 +9,7 @@ import pandas as pd
 
 # Local application imports
 from simulation.sumo_runner import create_od_tazrelation_xml, simulate_od
-from utils.link_flow_analysis import compute_nrmse_counts_all_links, parse_link_flow_xml_to_pandas
+from utils.link_flow_analysis import compute_nrmse_all_links, parse_link_flow_xml_to_pandas
 
 
 def run_initial_evaluation(
@@ -26,7 +26,8 @@ def run_initial_evaluation(
     routes_df,
     routes_per_od,
     link_selection,
-    sensor_flow_gt,
+    eval_measure,
+    sensor_measure_gt,
     dim_od,
 ):
     """
@@ -60,7 +61,9 @@ def run_initial_evaluation(
         Type of routes to use for the simulation (single or multiple).
     link_selection : list
         List of links selected for evaluation.
-    sensor_flow_gt : pd.DataFrame
+    eval_measure : str
+        Type of evaluation measurement (e.g., 'count', 'speed').
+    sensor_measure_gt : pd.DataFrame
         Ground truth sensor data for comparison.
     dim_od : int
         Dimension of OD matrix (number of OD pairs).
@@ -120,7 +123,7 @@ def run_initial_evaluation(
         config["sensor_end_time"],
         link_list=link_selection,
     )
-    curr_loss = compute_nrmse_counts_all_links(sensor_flow_gt, curr_link_stats)
+    curr_loss = compute_nrmse_all_links(eval_measure, sensor_measure_gt, curr_link_stats)
     print(f"Loss: {curr_loss:.4f}")
 
     # Save loss
@@ -158,7 +161,8 @@ def run_sample_evaluation(
     base_path,
     routes_df,
     routes_per_od,
-    sensor_flow_gt,
+    eval_measure,
+    sensor_measure_gt,
     link_selection,
     num_train_data,
 ):
@@ -185,8 +189,10 @@ def run_sample_evaluation(
         Route information DataFrame.
     routes_per_od : str
         Type of routes to use for the simulation (single or multiple).
-    sensor_flow_gt : pd.DataFrame
-        Ground truth sensor data for evaluation.
+    eval_measure : str
+        Type of evaluation measurement (e.g., 'count', 'speed').
+    sensor_measure_gt : pd.DataFrame
+        Ground truth sensor measurement data for evaluation.
     link_selection : list
         List of links selected for evaluation.
     num_train_data : int
@@ -248,7 +254,7 @@ def run_sample_evaluation(
         config["sensor_end_time"],
         link_list=link_selection,
     )
-    curr_loss = compute_nrmse_counts_all_links(sensor_flow_gt, curr_link_stats)
+    curr_loss = compute_nrmse_all_links(eval_measure, sensor_measure_gt, curr_link_stats)
     print(f"Loss: {curr_loss:.4f} | Runtime: {run_time:.2f}s")
 
     # Annotate link stats
@@ -281,7 +287,8 @@ def run_single_od_evaluation(
     routes_df,
     routes_per_od,
     link_selection,
-    sensor_flow_gt,
+    eval_measure,
+    sensor_measure_gt,
 ):
     """
     Run a simulation for a single OD (Origin-Destination) vector and record the results.
@@ -371,20 +378,26 @@ def run_single_od_evaluation(
         config["sensor_end_time"],
         link_list=link_selection,
     )
-    curr_loss = compute_nrmse_counts_all_links(sensor_flow_gt, curr_link_stats)
+    curr_loss = compute_nrmse_all_links(eval_measure, sensor_measure_gt, curr_link_stats)
     print(f"Loss: {curr_loss:.4f}")
 
     # Merge ground truth and simulated flow data
-    sensor_flow_gt_temp = sensor_flow_gt.rename(columns={"interval_nVehContrib": "flow_gt"})[["link_id", "flow_gt"]]
-    curr_link_stats_temp = curr_link_stats.rename(columns={"interval_nVehContrib": "flow_simul"})[
-        ["link_id", "flow_simul"]
-    ]
-    merged_data = pd.merge(sensor_flow_gt_temp, curr_link_stats_temp, on="link_id", how="inner")
+    if eval_measure == 'count':
+        sensor_measure_gt_temp = sensor_measure_gt.rename(columns={"interval_nVehContrib": "flow_gt"})[["link_id", "flow_gt"]]
+        curr_link_stats_temp = curr_link_stats.rename(columns={"interval_nVehContrib": "flow_simul"})[
+            ["link_id", "flow_simul"]
+        ]
+    elif eval_measure == 'speed':
+        sensor_measure_gt_temp = sensor_measure_gt.rename(columns={"interval_harmonicMeanSpeed": "speed_gt"})[["link_id", "speed_gt"]]
+        curr_link_stats_temp = curr_link_stats.rename(columns={"interval_harmonicMeanSpeed": "speed_simul"})[
+            ["link_id", "speed_simul"]
+        ]
+    merged_data = pd.merge(sensor_measure_gt_temp, curr_link_stats_temp, on="link_id", how="inner")
 
     # Save to CSV
-    output_csv_path = Path(path_run_result) / "link_flow_compare.csv"
+    output_csv_path = Path(path_run_result) / "link_measure_compare.csv"
     merged_data.to_csv(output_csv_path, index=False)
-    print(f"Link flow comparison saved to {output_csv_path}")
+    print(f"Link measure comparison saved to {output_csv_path}")
 
     # Save NRMSE loss to a file
     nrmse_file = Path(path_run_result) / f"NRMSE_{curr_loss:.4f}.txt"
