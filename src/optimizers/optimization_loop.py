@@ -140,7 +140,7 @@ def run_optimization_loop(
 
         model_run_time_start = time.time()
         X_all_fullD_norm = normalize(X_all_fullD_real, bounds)
-        X_new_fullD_real = strategy.suggest(X_all_fullD_norm, Y_all_real, kernel, epoch=i, seed=seed_i)
+        X_new_fullD_real = strategy.suggest(X_all_fullD_norm, Y_all_real, kernel=kernel, epoch=i, seed=seed_i)
         model_run_time = time.time() - model_run_time_start
 
         model_run_time_new_row = pd.DataFrame(

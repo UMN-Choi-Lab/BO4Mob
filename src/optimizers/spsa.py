@@ -117,7 +117,7 @@ class SPSAStrategy(BaseStrategy):
         self.sensor_measure_gt = sensor_measure_gt
         self.link_selection = link_selection
 
-    def suggest(self, X_all_fullD_norm, Y_all_real, epoch, seed):
+    def suggest(self, X_all_fullD_norm, Y_all_real, kernel, epoch, seed):
         """
         Suggest new candidate point using SPSA gradient approximation.
 
