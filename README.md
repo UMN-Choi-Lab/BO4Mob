@@ -2,6 +2,11 @@
 
 ![Intro Movie](assets/intro_movie.gif)
 
+
+[![NeurIPS 2025](https://img.shields.io/badge/NeurIPS-2025-blue.svg)](https://neurips.cc/virtual/2025/loc/san-diego/poster/121585) [![arXiv](https://img.shields.io/badge/arXiv-2510.18824-b31b1b.svg)](https://arxiv.org/abs/2510.18824)
+
+
+
 This repository presents benchmarks for evaluating Bayesian Optimization (BO) methods in high-dimensional, real-world urban mobility settings — specifically, origin-destination (OD) estimation in traffic simulations.
 
 - **Simulation backend**: [SUMO (Simulation of Urban Mobility)](https://www.eclipse.org/sumo/)
@@ -393,6 +398,13 @@ This mode runs an initial search followed by model-based optimization (if specif
 - If the initial search has already been completed for the same seed/config, only the model optimization will run.
 - Some large networks (e.g., `4smallRegion`, `5fullRegion`) may require significant memory and CPU resources. Make sure your machine meets the requirements.
 - You can limit CPU usage using the `--cpu_max` argument to avoid system overload.
+- The results in the paper (see Table 2) use data from:
+  - Date: `221014`
+  - Time: `08–09`
+- ⚠️ Important Note
+  - The results may vary depending on the selected date and time window.
+  - Sensor reliability filtering varies across different subsets of data, which may lead to different experimental trends.
+
 
 </details>
 
@@ -765,3 +777,14 @@ src/models/gp_models.py
   ```
 
 </details>
+
+
+### Reference
+```
+@article{ryu2025bo4mob,
+  title={BO4Mob: Bayesian Optimization Benchmarks for High-Dimensional Urban Mobility Problem},
+  author={Ryu, Seunghee and Kwon, Donghoon and Choi, Seongjin and Deshwal, Aryan and Kang, Seungmo and Osorio, Carolina},
+  journal={arXiv preprint arXiv:2510.18824},
+  year={2025}
+}
+```
